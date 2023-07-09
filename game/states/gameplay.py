@@ -51,6 +51,11 @@ class Gameplay(GameState):
         self.bgm = None
         self.font = prepare.FONTS["Roboto-Regular"]
 
+        sheet_name = "0x72_DungeonTilesetII_v1.6"
+        sheet = prepare.GFX[sheet_name]
+        mapping = "assets/graphics/tile_list.txt"
+        self.cache = MappedImageCache(sheet=sheet, mapping=mapping)
+
     def startup(self, current_time, persistent, surface):
         super().startup(current_time, persistent, surface)
         # pg.mixer.music.load(self.bgm)
@@ -65,12 +70,9 @@ class Gameplay(GameState):
         self.status_bars = pg.sprite.Group()
         self.texts = pg.sprite.Group()
 
-        level_width = 16 * 1000
-        level_height = 9 * 1000
-        sheet_name = "0x72_DungeonTilesetII_v1.6"
-        sheet = prepare.GFX[sheet_name]
-        mapping = "assets/graphics/tile_list.txt"
-        cache = MappedImageCache(sheet=sheet, mapping=mapping)
+        level_width = 16 * 150
+        level_height = 9 * 150
+
         self.cursor = Cursor(
             name="cursor", image=prepare.GFX["crosshair_1"], cam=self.cam
         )
@@ -86,7 +88,7 @@ class Gameplay(GameState):
             height=level_height,
             display_width=self.screen.get_rect().width,
             display_height=self.screen.get_rect().height,
-            cache=cache,
+            cache=self.cache,
         )
 
         self.floor = self.level.build_floor()
