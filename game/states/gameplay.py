@@ -48,8 +48,8 @@ class Gameplay(GameState):
         self.debug = True
         self.zoom = 3
 
-        self.bgm = prepare.MUSIC["Anitek_-_07_-_Contact"]
-        self.font = pg.font.Font(prepare.FONTS["Roboto-Regular"], 24)
+        self.bgm = None
+        self.font = prepare.FONTS["Roboto-Regular"]
 
     def startup(self, current_time, persistent, surface):
         super().startup(current_time, persistent, surface)
@@ -145,7 +145,7 @@ class Gameplay(GameState):
             TargetedText(
                 target=self.player,
                 angle=-90,
-                font_file=prepare.FONTS["Roboto-Black"],
+                font_file=self.font,
                 text=self.player.diagnostics_pretty,
                 max_width=self.player.rect.width * 2,
             )
@@ -178,7 +178,7 @@ class Gameplay(GameState):
                 TargetedText(
                     target=sprite,
                     angle=-90,
-                    font_file=prepare.FONTS["Roboto-Black"],
+                    font_file=self.font,
                     text=sprite.diagnostics_pretty,
                     max_width=sprite.rect.width * 2,
                 )
