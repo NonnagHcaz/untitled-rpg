@@ -24,7 +24,7 @@ from game.components.sprites.text.text import TargetedText
 from game.level import Level
 
 from game.states.state import GameState
-from game.utils import MappedImageCache
+from game.utils.image_cache import ImageCache
 from game.utils.controls.controls import Controls
 
 logger = logging.getLogger(__name__)
@@ -51,10 +51,7 @@ class Gameplay(GameState):
         self.bgm = None
         self.font = prepare.FONTS["Roboto-Regular"]
 
-        sheet_name = "0x72_DungeonTilesetII_v1.6"
-        sheet = prepare.GFX[sheet_name]
-        mapping = "assets/graphics/tile_list.txt"
-        self.cache = MappedImageCache(sheet=sheet, mapping=mapping)
+        self.cache = prepare.GFX
 
     def startup(self, current_time, persistent, surface):
         super().startup(current_time, persistent, surface)

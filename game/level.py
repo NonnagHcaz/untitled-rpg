@@ -7,7 +7,6 @@ from game.components.sprites.entities.player.player import Player
 from game.components.sprites.sprite import MovableSprite, Sprite, MergedSprite
 from game.components.sprites.weapons.weapon import Arrow, Projectile
 from . import prepare
-from .utils import CoordinateMap
 
 
 class Level(object):
