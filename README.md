@@ -17,10 +17,16 @@ Tested with Python 3.10 and Pygame 2.5.0
 Credit
 -----------
 
-- [@0x72](https://0x72.itch.io)
+- [@0x72](https://0x72.itch.io/)
     - https://0x72.itch.io/dungeontileset-ii
 
-- [@o-lobster](https://o-lobster.itch.io)
+- [nijikokun](https://nijikokun.itch.io/)
+    - https://nijikokun.itch.io/dungeontileset-ii-extended
+
+- [@o-lobster](https://o-lobster.itch.io/)
     - https://o-lobster.itch.io/simple-dungeon-crawler-16x16-pixel-pack
+
+- [@ggbot](https://ggbot.itch.io/)
+    - https://ggbot.itch.io/pixeloid-font
 
 - https://fonts.google.com/specimen/Roboto
