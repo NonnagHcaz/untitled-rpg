@@ -36,23 +36,23 @@ class CameraAwareLayeredUpdates(pg.sprite.LayeredUpdates):
 
     def draw(self, surface):
         spritedict = self.spritedict
-        surface_blit = surface.blit
         dirty = self.lostsprites
         self.lostsprites = []
-        dirty_append = dirty.append
         init_rect = self._init_rect
 
-        for spr in self.sprites():
-            rec = spritedict[spr]
-            newrect = surface_blit(spr.image, spr.rect.move(self.cam))
-            if rec is init_rect:
-                dirty_append(newrect)
+        zoomed_cam = self.cam.apply_zoom(self.cam)
+
+        for sprite in self.sprites():
+            rect = spritedict[sprite]
+            newrect = surface.blit(sprite.image, sprite.rect.move(zoomed_cam))
+            if rect is init_rect:
+                dirty.append(newrect)
             else:
-                if newrect.colliderect(rec):
-                    dirty_append(newrect.union(rec))
+                if newrect.colliderect(rect):
+                    dirty.append(newrect.union(rect))
                 else:
-                    dirty_append(newrect)
-                    dirty_append(rec)
-            spritedict[spr] = newrect
+                    dirty.append(newrect)
+                    dirty.append(rect)
+            spritedict[sprite] = newrect
 
         return dirty
