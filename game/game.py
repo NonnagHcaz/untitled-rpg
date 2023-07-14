@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import K_RALT, K_RETURN, VIDEOEXPOSE, VIDEORESIZE, RESIZABLE
 import pickle
 import logging
+from game import config
 
 from game.utils.asset_cache import AssetCache
 
@@ -20,9 +21,12 @@ class Game(object):
     and its run method serves as the "game loop".
     """
 
-    def __init__(
-        self, screen_size=(1920, 1080), caption="Untitled Adventure RPG", fps=60
-    ):
+    def __init__(self, screen_size=None, caption=config.CAPTION, fps=config.FRAMERATE):
+        pygame.init()
+
+        if screen_size is None:
+            screen_size = self.get_largest_display()
+
         self.original_caption = caption
         self.original_screen_size = screen_size
         self.original_fps = fps
@@ -33,7 +37,6 @@ class Game(object):
 
         self.screen_width, self.screen_height = self.screen_size
 
-        pygame.init()
         pygame.display.set_caption(self.caption)
         self.screen = pygame.display.set_mode(self.screen_size, RESIZABLE)
 
@@ -51,6 +54,21 @@ class Game(object):
         self.next_state = None
 
         self.asset_cache = AssetCache()
+
+    def get_largest_display(self):
+        # Get the user's screen size
+        screen_info = pygame.display.Info()
+        screen_width = screen_info.current_w
+        screen_height = screen_info.current_h
+
+        # Find the largest screen size that fits within the user's screen
+        largest_size = (0, 0)
+        for size in config.SCREEN_SIZES.values():
+            if size[0] <= screen_width and size[1] <= screen_height:
+                if size[0] > largest_size[0] and size[1] > largest_size[1]:
+                    largest_size = size
+
+        return largest_size
 
     def save_game(self, filename, state_name="GAME"):
         state = self.state_dict.get(state_name, self.current_state)

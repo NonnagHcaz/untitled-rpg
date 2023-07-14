@@ -20,9 +20,8 @@ SCREEN_SIZES = {
     "16K UHD": (15360, 8640),
 }
 
-FRAMERATE = 60
-SCREEN_SIZE = SCREEN_SIZES["Full HD"]
-ORIGINAL_CAPTION = "Untitled Adventure RPG"
+FRAMERATE = 60.0
+CAPTION = "Untitled Adventure RPG"
 TEXTURE_SCALE = 1
 
 IMAGE_ACCEPTS = (".png", ".jpg", ".bmp")
