@@ -1,12 +1,30 @@
-import pygame as pg
+import pygame
 
 
-class Camera(pg.Vector2):
+class Camera(pygame.Vector2):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.zoom_level = 1.0
+        self.max_level = 3.0
+        self.min_level = 1.0
+
+    def set_zoom(self, zoom_level):
+        self.zoom_level = zoom_level
+
+    def zoom_in(self, zoom_step=0.1):
+        self.zoom_level = min(self.max_level, self.zoom_level + zoom_step)
+
+    def zoom_out(self, zoom_step=0.1):
+        self.zoom_level = max(self.min_level, self.zoom_level - zoom_step)
+
+    def apply_zoom(self, position):
+        return position * self.zoom_level
+
+    def apply_inverse_zoom(self, position):
+        return position / self.zoom_level
 
 
-class CameraAwareLayeredUpdates(pg.sprite.LayeredUpdates):
+class CameraAwareLayeredUpdates(pygame.sprite.LayeredUpdates):
     def __init__(self, target, world_size, cam):
         super().__init__()
 
@@ -19,13 +37,16 @@ class CameraAwareLayeredUpdates(pg.sprite.LayeredUpdates):
         if self.target:
             self.add(target)
 
-    def update(self, surface, *args, **kwargs):
-        super().update(*args, **kwargs)
+    def update(self, surface, camera=None, *args, **kwargs):
+        super().update(surface, camera or self.cam, *args, **kwargs)
         if self.target:
             x = -self.target.rect.center[0] + surface.get_rect().width / 2
             y = -self.target.rect.center[1] + surface.get_rect().height / 2
-            # print((x, y), self.target.rect.center, surface.get_rect().size)
-            self.cam += pg.Vector2((x, y)) - self.cam  # * 0.05
+
+            zoomed_x = self.cam.apply_zoom(pygame.Vector2((x, y))).x
+            zoomed_y = self.cam.apply_zoom(pygame.Vector2((x, y))).y
+
+            self.cam += pygame.Vector2((zoomed_x, zoomed_y)) - self.cam
             self.cam.x = max(
                 -(self.world_size.width - surface.get_rect().width), min(0, self.cam.x)
             )
