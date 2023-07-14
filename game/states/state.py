@@ -9,7 +9,7 @@ class GameState(object):
     must be overloaded in the childclass.  startup and cleanup need to be
     overloaded when there is data that must persist between States."""
 
-    def __init__(self):
+    def __init__(self, game, asset_cache):
         self.start_time = 0.0
         self.current_time = 0.0
         self.done = False

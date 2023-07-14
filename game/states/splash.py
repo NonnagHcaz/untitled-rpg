@@ -2,25 +2,31 @@
 The splash screen of the game. The first thing the user sees.
 """
 
-import pygame as pg
+import pygame
+
+from game.utils.asset_cache import _fn
 
 from .state import GameState
-from .. import prepare
+from .. import config
+import os
 
 
-class Splash(GameState):
+class SplashState(GameState):
     """This State is updated while our game shows the splash screen."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, game, asset_cache):
+        super().__init__(game, asset_cache)
         self.next = "GAME"
         self.timeout = 5
-        self.cover = pg.Surface((prepare.SCREEN_SIZE)).convert()
+
+    def startup(self, current_time, persistant, surface):
+        self.image = self.asset_cache[_fn(os.path.join(config.GFX_DIR, "splash1.png"))]
+        self.rect = self.image.get_rect(center=surface.get_rect().center)
+        self.cover = surface.copy().convert()
         self.cover.fill(0)
         self.cover_alpha = 256
         self.alpha_step = 2
-        self.image = prepare.GFX["splash1"]
-        self.rect = self.image.get_rect(center=prepare.SCREEN_RECT.center)
+        return super().startup(current_time, persistant, surface)
 
     def update(self, surface, current_time, time_delta):
         """Updates the splash screen."""
@@ -35,5 +41,5 @@ class Splash(GameState):
     def get_event(self, event):
         """Get events from Control. Currently changes to next state on any key
         press."""
-        if event.type == pg.KEYDOWN:
+        if event.type == pygame.KEYDOWN:
             self.done = True
