@@ -1,10 +1,11 @@
 """https://gist.github.com/iminurnamez/8d51f5b40032f106a847"""
-import pygame as pg
-from pygame.locals import K_RALT, K_RETURN, VIDEOEXPOSE, VIDEORESIZE
-
+import pygame
+from pygame.locals import K_RALT, K_RETURN, VIDEOEXPOSE, VIDEORESIZE, RESIZABLE
+import pickle
 import logging
 
-from game import prepare
+from game.utils.asset_cache import AssetCache
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,57 +20,107 @@ class Game(object):
     and its run method serves as the "game loop".
     """
 
-    def __init__(self, caption):
-        self.screen = pg.display.get_surface()
-        self.screen_width, self.screen_height = self.screen.get_rect().size
-        self.caption = caption
+    def __init__(
+        self, screen_size=(1920, 1080), caption="Untitled Adventure RPG", fps=60
+    ):
+        self.original_caption = caption
+        self.original_screen_size = screen_size
+        self.original_fps = fps
+
+        self.screen_size = self.original_screen_size
+        self.caption = self.original_caption
+        self.fps = self.original_fps
+
+        self.screen_width, self.screen_height = self.screen_size
+
+        pygame.init()
+        pygame.display.set_caption(self.caption)
+        self.screen = pygame.display.set_mode(self.screen_size, RESIZABLE)
+
         self.done = False
-        self.clock = pg.time.Clock()
-        self.fps = prepare.FRAMERATE
+        self.clock = pygame.time.Clock()
+        self.keys = pygame.key.get_pressed()
+
         self.show_fps = True
         self.current_time = 0.0
-        self.keys = pg.key.get_pressed()
+
         self.state_dict = {}
-        self.state_name = None
-        self.state = None
+        self.current_state_name = None
+        self.current_state = None
+        self.previous_state = None
+        self.next_state = None
+
+        self.asset_cache = AssetCache()
+
+    def save_game(self, filename, state_name="GAME"):
+        state = self.state_dict.get(state_name, self.current_state)
+
+        game_state = {
+            "player_position": (
+                state.player.rect.x,
+                state.player.rect.y,
+            ),
+            # Add more game state variables as needed
+        }
+        with open(filename, "wb") as file:
+            pickle.dump(game_state, file)
+        print("Game saved.")
+
+    def load_game(self, filename):
+        try:
+            with open(filename, "rb") as file:
+                game_state = pickle.load(file)
+            print(game_state)
+            # Update other game state variables as needed
+            print("Game loaded.")
+        except FileNotFoundError:
+            print("No save file found.")
+
+        self.current_state.next_state = "GAME"
+        self.flip_state()
 
     def setup_states(self, state_dict, start_state):
         """Given a dictionary of States and a State to start in,
         builds the self.state_dict."""
         self.state_dict = state_dict
-        self.state_name = start_state
-        self.state = self.state_dict[self.state_name]
-        self.state.startup(self.current_time, None, self.screen)
+        self.current_state_name = start_state
+        self.current_state = self.state_dict[self.current_state_name]
+        self.current_state.startup(self.current_time, None, self.screen)
 
     def event_loop(self):
         """Process all events and pass them down to current State.  The f5 key
         globally turns on/off the display of FPS in the caption"""
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 self.done = True
                 break
-            elif event.type == pg.KEYDOWN:
-                self.keys = pg.key.get_pressed()
+            elif event.type == pygame.KEYDOWN:
+                self.keys = pygame.key.get_pressed()
                 self.toggle_show_fps(event.key)
                 if self.keys[K_RALT] and self.keys[K_RETURN]:
-                    pg.display.toggle_fullscreen()
-            elif event.type == pg.KEYUP:
-                self.keys = pg.key.get_pressed()
+                    pygame.display.toggle_fullscreen()
             elif event.type == VIDEORESIZE:
                 r0 = self.screen.copy().get_rect()
-                self.screen = pg.display.get_surface()
+                self.screen = pygame.display.get_surface()
                 r1 = self.screen.copy().get_rect()
 
-            self.state.get_event(event)
+            self.current_state.get_event(event)
 
     def flip_state(self):
         """When a State changes to done necessary startup and cleanup functions
         are called and the current State is changed."""
-        previous, self.state_name = self.state_name, self.state.next
-        persist = self.state.cleanup()
-        self.state = self.state_dict[self.state_name]
-        self.state.startup(self.current_time, persist, self.screen)
-        self.state.previous = previous
+        self.previous_state, self.current_state_name = (
+            self.current_state,
+            self.current_state.next_state,
+        )
+        persist = self.current_state.cleanup()
+        try:
+            self.next_state = self.state_dict[self.current_state_name]
+            self.next_state.startup(self.current_time, persist, self.screen)
+            self.next_state.previous_state = self.previous_state
+            self.current_state = self.next_state
+        except KeyError:
+            self.done = True
 
     def update(self, dt):
         """
@@ -78,25 +129,25 @@ class Game(object):
         dt: milliseconds since last frame
         """
         self.screen.fill((0, 0, 0))
-        self.current_time = pg.time.get_ticks()
-        self.keys = pg.key.get_pressed()
-        if self.state.quit:
+        self.current_time = pygame.time.get_ticks()
+        self.keys = pygame.key.get_pressed()
+        if self.current_state.quit:
             self.done = True
-        elif self.state.done:
+        elif self.current_state.done:
             self.flip_state()
 
         if not self.done:
-            self.state.update(self.screen, self.current_time, dt)
+            self.current_state.update(self.screen, self.current_time, dt)
             fps = self.clock.get_fps()
-            with_fps = "{} - {:.2f} FPS".format(self.caption, fps)
-            pg.display.set_caption(with_fps)
+            with_fps = f"{self.caption} - {fps:.2f} FPS - {self.current_state.zoom*100:.0f}% Zoom"
+            pygame.display.set_caption(with_fps)
 
     def toggle_show_fps(self, key):
         """Press f5 to turn on/off displaying the framerate in the caption."""
-        if key == pg.K_F3:
+        if key == pygame.K_F3:
             self.show_fps = not self.show_fps
             if not self.show_fps:
-                pg.display.set_caption(self.caption)
+                pygame.display.set_caption(self.caption)
 
     def run(self):
         """
@@ -107,5 +158,5 @@ class Game(object):
             dt = self.clock.tick(self.fps)
             self.event_loop()
             self.update(dt)
-            pg.display.update()
-        pg.quit()
+            pygame.display.update()
+        pygame.quit()
