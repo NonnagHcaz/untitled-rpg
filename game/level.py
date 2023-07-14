@@ -10,6 +10,83 @@ from game.components.sprites.sprite import MovableSprite, Sprite, MergedSprite
 from game.components.sprites.weapons.weapon import Arrow, Projectile
 
 
+class AutoTileset(object):
+    def __init__(self, image, tile_width, tile_height=None) -> None:
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.tiles = self._split(tile_width, tile_height)
+
+    def _split(self, tile_width=None, tile_height=None, tile_size=None):
+        if tile_size and len(tile_size) == 2:
+            tile_width, tile_height = tile_size
+
+        self.tile_width = tile_width
+        self.tile_height = tile_height or tile_width
+        image_width, image_height = self.rect.size
+
+        rows = image_height // tile_height
+        cols = image_width // tile_width
+
+        tiles = []
+        for col in range(cols):
+            for row in range(rows):
+                sprite = None
+
+        return tiles
+
+    def neighbors(self, tile):
+        return None
+
+
+class Tile(Sprite):
+    def __init__(self, name=None, image=None, debug=False):
+        super().__init__(name, image, debug)
+
+    def autotile(surface, tile_index, bitmask_value, tile_size):
+        tile_sheet_width = 256
+        tile_sheet_height = 192
+        tile_per_row = tile_sheet_width // tile_size[0]
+        row = tile_index // tile_per_row
+        col = tile_index % tile_per_row
+
+        x = col * tile_size[0]
+        y = row * tile_size[1]
+
+        source_rect = pygame.Rect(x, y, tile_size[0], tile_size[1])
+        dest_rect = pygame.Rect(0, 0, tile_size[0], tile_size[1])
+
+        surface.blit(surface, dest_rect, source_rect)
+
+
+class BitMask(object):
+    def __init__(self) -> None:
+        self.mask = []
+
+
+class Room(object):
+    pass
+
+
+class SpawnRoom(Room):
+    def __init__(self) -> None:
+        super().__init__()
+
+
+class SmallRoom(Room):
+    def __init__(self) -> None:
+        super().__init__()
+
+
+class LargeRoom(Room):
+    def __init__(self) -> None:
+        super().__init__()
+
+
+class XLargeRoom(Room):
+    def __init__(self) -> None:
+        super().__init__()
+
+
 class Level(object):
     def __init__(self, width, height, display_width, display_height, cache):
         self.cache = cache
