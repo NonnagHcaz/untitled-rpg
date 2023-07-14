@@ -5,7 +5,7 @@ import glob
 import logging
 import re
 
-from game import utils
+from game import config, utils
 
 logger = logging.getLogger(__name__)
 
@@ -406,7 +406,7 @@ def parse_0x72_mapping(map_file, header=False, delimiter=" "):
 
 
 def _strip(sheet, rect):
-    _mult = 1
+    _mult = config.TEXTURE_SCALE
     sub_surf = pygame.transform.scale_by(sheet.subsurface(rect), _mult)
     return sub_surf
 
