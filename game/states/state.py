@@ -1,6 +1,6 @@
 # https://gist.github.com/iminurnamez/8d51f5b40032f106a847
 
-import pygame as pg
+import pygame
 
 
 class GameState(object):
@@ -50,11 +50,6 @@ class GameState(object):
         """Update function for state.  Must be overloaded in children."""
         self.current_time = current_time
         self.total_frames += 1
-
-        self.events = pg.event.get()
-        self.pressed_keys = pg.key.get_pressed()
-        self.pressed_btns = pg.mouse.get_pressed(num_buttons=5)
-        self.mouse_pos = pg.mouse.get_pos()
 
         if self.current_time - self.timer > 1000.0 / 5.0:
             self.blink = not self.blink

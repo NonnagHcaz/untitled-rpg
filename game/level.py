@@ -1,12 +1,13 @@
 import math
+import os
 import random
-import pygame as pg
+import pygame
+from game import config
 from game.components.sprites.entities.enemies.enemy import Enemy
 from game.components.sprites.entities.entity import Entity
 from game.components.sprites.entities.player.player import Player
 from game.components.sprites.sprite import MovableSprite, Sprite, MergedSprite
 from game.components.sprites.weapons.weapon import Arrow, Projectile
-from . import prepare
 
 
 class Level(object):
@@ -18,6 +19,10 @@ class Level(object):
 
         self.display_width = display_width
         self.display_height = display_height
+        self.spritesheets = {
+            "0x72d2": os.path.join(config.GFX_DIR, "0x72_DungeonTilesetII_v1.6.png"),
+            "0x72ex": os.path.join(config.GFX_DIR, "dungeontileset-extended.png"),
+        }
 
     @property
     def size(self):
@@ -58,7 +63,7 @@ class Level(object):
 
     def spawn_projectile(self, name, cam_pos, mouse_pos, image=None):
         if image is None:
-            image = self.cache["name"]
+            image = self.cache[(self.spritesheets["0x72d2"], name)]
         dx = mouse_pos[0] - cam_pos[0]
         dy = mouse_pos[1] - cam_pos[1]
         m = dy / dx
@@ -72,13 +77,13 @@ class Level(object):
 
     def spawn_orb(self, cam_pos, mouse_pos, color=None, radius=8, border_width=0):
         name = "weapon_orb"
-        image = pg.Surface((16, 16), pg.SRCALPHA)
+        image = pygame.Surface((16, 16), pygame.SRCALPHA)
         if color is None:
             r = random.randint(0, 255)
             g = random.randint(0, 255)
             b = random.randint(0, 255)
             color = (r, g, b)
-        pg.draw.circle(
+        pygame.draw.circle(
             surface=image,
             color=color,
             center=mouse_pos,
@@ -90,7 +95,7 @@ class Level(object):
 
     def spawn_arrow(self, cam_pos, mouse_pos):
         name = "weapon_arrow"
-        image = self.cache[name]
+        image = self.cache[(self.spritesheets["0x72d2"], name)]
 
         # sprite.spawn(x=self.width//2, y=self.height//2)
         return self.spawn_projectile(name, cam_pos, mouse_pos, image)
@@ -101,8 +106,14 @@ class Level(object):
     def spawn_sprite(
         self, name="knight_m", pos=(None, None), is_player=False, is_enemy=False
     ):
-        idle_frames = [self.cache[f"{name}_idle_anim_f{x}"] for x in range(0, 4)]
-        walk_frames = [self.cache[f"{name}_run_anim_f{x}"] for x in range(0, 4)]
+        idle_frames = [
+            self.cache[(self.spritesheets["0x72d2"], f"{name}_idle_anim_f{x}")]
+            for x in range(0, 4)
+        ]
+        walk_frames = [
+            self.cache[(self.spritesheets["0x72d2"], f"{name}_run_anim_f{x}")]
+            for x in range(0, 4)
+        ]
 
         config = {
             "name": name,
@@ -174,10 +185,21 @@ class Level(object):
         name = "dwarf_f"
         return self.spawn_sprite(name, pos, is_player)
 
-    def build_floor(self):
+    def build_spawn_room(self, width=0, radius=0):
+        pass
+
+    def build_multilevel_room(self, width=0, radius=0):
+        pass
+
+    def build_room(self, width, height, border_radius=0, imperfect=True, **config):
+        pass
+
+    def build_test_floor(self):
         tiles = []
 
-        floor_frames = [self.cache[f"floor_{x}"] for x in range(1, 9)]
+        floor_frames = [
+            self.cache[(self.spritesheets["0x72d2"], f"floor_{x}")] for x in range(1, 9)
+        ]
         _t0 = floor_frames[0].get_rect()
         _tw, _th = _t0.width, _t0.height
         _y = _th * 2
@@ -193,7 +215,7 @@ class Level(object):
         for x in range(0, self.width, _tw):
             y = self.height - _th * 1.5
             name = "edge_down"
-            image = self.cache[name]
+            image = self.cache[(self.spritesheets["0x72d2"], name)]
             sprite = Sprite(name=name, image=image)
             sprite.spawn(pos=(x, y))
             tiles.append(sprite)
@@ -204,14 +226,14 @@ class Level(object):
 
         return floor
 
-    def build_walls(self):
+    def build_test_walls(self):
         tiles = []
         _wh = 2
         _we = True
         _gw, _gh = self.width, self.height
         _gw50, _gh50 = _gw // 2, _gh // 2
 
-        _t0 = self.cache["wall_edge_top_left"].get_rect()
+        _t0 = self.cache[(self.spritesheets["0x72d2"], "wall_edge_top_left")].get_rect()
         _tw, _th = _t0.width, _t0.height
         _bx, _by = _gw // _tw, _gh // _th
 
@@ -241,7 +263,7 @@ class Level(object):
                 else:
                     name = None
                 if name:
-                    image = self.cache[name]
+                    image = self.cache[(self.spritesheets["0x72d2"], name)]
                     sprite = Sprite(name=name, image=image)
                     sprite.spawn(pos=(x, y))
                     tiles.append(sprite)

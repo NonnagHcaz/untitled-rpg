@@ -1,7 +1,8 @@
 import datetime
 import math
+import os
 import random
-import pygame as pg
+import pygame
 from pygame.locals import (
     KEYDOWN,
     KEYUP,
@@ -11,6 +12,8 @@ from pygame.locals import (
     K_r,
     QUIT,
     MOUSEBUTTONUP,
+    K_PAGEUP,
+    K_PAGEDOWN,
 )
 
 from game.components.camera.camera import Camera, CameraAwareLayeredUpdates
@@ -21,17 +24,17 @@ from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 
 import logging
 from game.components.sprites.text.text import TargetedText
-from game.level import Level
+from game.level import Dungeon
 
 from game.states.state import GameState
-from game.utils.image_cache import ImageCache
+from game.utils.asset_cache import AssetCache, _fn
 from game.utils.controls.controls import Controls
 
 logger = logging.getLogger(__name__)
 
-from .. import prepare
+from .. import config
 
-# pg.mouse.set_visible(False)
+# pygame.mouse.set_visible(False)
 
 
 class Gameplay(GameState):
@@ -46,32 +49,34 @@ class Gameplay(GameState):
         self.floors = None
         self.all_sprites = None
         self.debug = True
-        self.zoom = 3
-
-        self.bgm = None
-        self.font = prepare.FONTS["Roboto-Regular"]
-
-        self.cache = prepare.GFX
+        self.zoom = 1
 
     def startup(self, current_time, persistent, surface):
         super().startup(current_time, persistent, surface)
-        # pg.mixer.music.load(self.bgm)
-        # pg.mixer.music.play(-1)
+        # pygame.mixer.music.load(self.bgm)
+        # pygame.mixer.music.play(-1)
         self.cam = Camera()
+
+        self.bgm = None
+        self.font = None
 
         self.controls = Controls()
 
-        self.enemies = pg.sprite.Group()
-        self.projectiles = pg.sprite.Group()
-        self.hitboxes = pg.sprite.Group()
-        self.status_bars = pg.sprite.Group()
-        self.texts = pg.sprite.Group()
+        self.enemies = pygame.sprite.Group()
+        self.projectiles = pygame.sprite.Group()
+        self.hitboxes = pygame.sprite.Group()
+        self.status_bars = pygame.sprite.Group()
+        self.texts = pygame.sprite.Group()
 
         level_width = 16 * 150
         level_height = 9 * 150
 
         self.cursor = Cursor(
-            name="cursor", image=prepare.GFX["crosshair_1"], cam=self.cam
+            name="cursor",
+            image=self.asset_cache[
+                _fn(os.path.join(config.GFX_DIR, "crosshair_1.png"))
+            ],
+            cam=self.cam,
         )
 
         self.cursor.text = TargetedText(
@@ -80,16 +85,16 @@ class Gameplay(GameState):
             max_width=self.cursor.rect.width * 2,
         )
 
-        self.level = Level(
+        self.level = Dungeon(
             width=level_width,
             height=level_height,
             display_width=self.screen.get_rect().width,
             display_height=self.screen.get_rect().height,
-            cache=self.cache,
+            cache=self.asset_cache,
         )
 
-        self.floor = self.level.build_floor()
-        self.walls = self.level.build_walls()
+        self.floor = self.level.build_test_floor()
+        self.walls = self.level.build_test_walls()
 
         self.player = self.level.spawn_player()
         self.player.debug = self.debug
@@ -105,9 +110,9 @@ class Gameplay(GameState):
                 target=self.player,
                 offset=offsets[0],
                 width=self.player.rect.width * 2,
-                primary_color=pg.Color("red"),
-                secondary_color=pg.Color("black"),
-                border_color=pg.Color("white"),
+                primary_color=pygame.Color("red"),
+                secondary_color=pygame.Color("black"),
+                border_color=pygame.Color("white"),
                 border_width=2,
                 current_attribute="health",
                 max_attribute="base_health",
@@ -119,9 +124,9 @@ class Gameplay(GameState):
                 target=self.player,
                 offset=offsets[1],
                 width=self.player.rect.width * 2,
-                primary_color=pg.Color("green"),
-                secondary_color=pg.Color("black"),
-                border_color=pg.Color("white"),
+                primary_color=pygame.Color("green"),
+                secondary_color=pygame.Color("black"),
+                border_color=pygame.Color("white"),
                 border_width=2,
                 current_attribute="stamina",
                 max_attribute="base_stamina",
@@ -132,9 +137,9 @@ class Gameplay(GameState):
                 target=self.player,
                 offset=offsets[2],
                 width=self.player.rect.width * 2,
-                primary_color=pg.Color("blue"),
-                secondary_color=pg.Color("black"),
-                border_color=pg.Color("white"),
+                primary_color=pygame.Color("blue"),
+                secondary_color=pygame.Color("black"),
+                border_color=pygame.Color("white"),
                 border_width=2,
                 current_attribute="mana",
                 max_attribute="base_mana",
@@ -150,7 +155,7 @@ class Gameplay(GameState):
             )
         )
 
-        self.mp_line = pg.sprite.Sprite()
+        self.mp_line = pygame.sprite.Sprite()
 
         for _ in range(10):
             x = random.randint(int(self.level.width * 0.1), int(self.level.width * 0.9))
@@ -166,8 +171,8 @@ class Gameplay(GameState):
                     target=sprite,
                     offset=5,
                     width=sprite.rect.width * 2,
-                    primary_color=pg.Color("red"),
-                    border_color=pg.Color("white"),
+                    primary_color=pygame.Color("red"),
+                    border_color=pygame.Color("white"),
                     border_width=2,
                     current_attribute="health",
                     max_attribute="base_health",
@@ -185,7 +190,7 @@ class Gameplay(GameState):
 
         self.all_sprites = CameraAwareLayeredUpdates(
             target=self.player,
-            world_size=pg.Rect(0, 0, level_width, level_height),
+            world_size=pygame.Rect(0, 0, level_width, level_height),
             cam=self.cam,
         )
 
@@ -201,19 +206,30 @@ class Gameplay(GameState):
 
     def cleanup(self):
         """Stop the music when scene is done."""
-        # pg.mixer.music.stop()
+        # pygame.mixer.music.stop()
         return super().cleanup()
 
     def get_event(self, event):
-        if event.type == pg.QUIT:
+        if event.type == pygame.QUIT:
             self.quit = True
 
     def handle_controls(self):
         if not self.player:
             return
+
         controls = self.controls
-        pressed_keys = self.pressed_keys
-        pressed_btns = self.pressed_btns
+        pressed_keys = pygame.key.get_pressed()
+        pressed_btns = pygame.mouse.get_pressed(num_buttons=5)
+
+        if pressed_keys[pygame.K_ESCAPE]:
+            self.next_state = "PAUSE"
+            self.game.flip_state()
+
+        if pressed_keys[pygame.K_k]:
+            self.player.kill()
+
+        if pressed_keys[pygame.K_r]:
+            self.possess()
 
         if controls.pressed_sprint_hold(pressed_keys, pressed_btns):
             self.player.is_crouching = 0
@@ -243,6 +259,13 @@ class Gameplay(GameState):
             # self.player.direction = self.player.Direction.EAST
             _x += self.player.speed
 
+        if pressed_keys[K_PAGEDOWN]:
+            self.cam.zoom_out()
+        elif pressed_keys[K_PAGEUP]:
+            self.cam.zoom_in()
+
+        self.zoom = self.cam.zoom_level
+
         if self.player.x + self.cam.x < self.cursor.x:
             self.player.direction = self.player.Direction.EAST
         else:
@@ -259,7 +282,7 @@ class Gameplay(GameState):
                     self.all_sprites.add(sprite)
                     self.all_sprites.move_to_front(sprite)
 
-        # if pressed_btns[0]:  # and pg.MOUSEBUTTONUP in [x.type for x in events]:
+        # if pressed_btns[0]:  # and pygame.MOUSEBUTTONUP in [x.type for x in events]:
 
         if _x != 0 or _y != 0:
             if self.player.is_idle:
@@ -283,10 +306,10 @@ class Gameplay(GameState):
                 self.player.is_idle = True
 
     def check_collisions(self):
-        player_enemies = pg.sprite.spritecollide(
+        player_enemies = pygame.sprite.spritecollide(
             self.player, self.enemies, dokill=False
         )
-        player_projectiles = pg.sprite.spritecollide(
+        player_projectiles = pygame.sprite.spritecollide(
             self.player, self.projectiles, dokill=False
         )
 
@@ -298,37 +321,40 @@ class Gameplay(GameState):
             self.player.health -= projectile.damage
 
         for enemy in self.enemies:
-            enemy_projectiles = pg.sprite.spritecollide(
+            enemy_projectiles = pygame.sprite.spritecollide(
                 enemy, self.projectiles, dokill=False
             )
             for projectile in enemy_projectiles:
                 enemy.blink()
                 enemy.health -= projectile.damage
 
-    def respawn(self):
+    def possess(self):
         print("respawn")
-        self.all_sprites.target = random.choice([x for x in self.enemies])
+        try:
+            self.all_sprites.target = random.choice([x for x in self.enemies])
+            self.real_player = self.player
+            self.player = self.all_sprites.target
+        except IndexError:
+            pass
 
-    def update(self, surface, current_time, time_delta):
+    def update(self, surface, current_time, dt):
         super().update(surface, current_time)
-
-        for event in self.events:
-            if event.type == QUIT:
-                self.quit = True
-
         self.handle_controls()
+
+        fake_surface = surface.copy()
         self.check_collisions()
         self.cursor.update()
         self.cursor.text.update()
-        self.all_sprites.update(surface)
-        surface.fill(pg.Color("black"))
-        self.all_sprites.draw(surface)
 
-        surface.blit(self.cursor.image, self.cursor.rect)
-        surface.blit(self.cursor.text.image, self.cursor.text.rect)
-        self.draw_mp_line(surface)
+        self.all_sprites.update(fake_surface)
+        fake_surface.fill(pygame.Color("black"))
+        self.all_sprites.draw(fake_surface)
 
-        # surface.blit(self.player.image, self.player.rect)
+        fake_surface.blit(self.cursor.image, self.cursor.rect)
+        fake_surface.blit(self.cursor.text.image, self.cursor.text.rect)
+        self.draw_mp_line(fake_surface)
+
+        surface.blit(fake_surface, (0, 0))
 
     def pause(self):
         pass
@@ -346,9 +372,9 @@ class Gameplay(GameState):
         pass
 
     def draw_mp_line(self, surface):
-        pg.draw.line(
+        pygame.draw.line(
             surface,
-            pg.Color("red"),
-            pg.Vector2(self.player.pos) + self.cam,
+            pygame.Color("red"),
+            pygame.Vector2(self.player.pos) + self.cam,
             self.cursor.pos,
         )
