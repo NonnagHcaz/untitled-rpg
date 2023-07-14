@@ -1,5 +1,5 @@
 import re
-import pygame as pg
+import pygame
 import math
 
 
@@ -16,7 +16,7 @@ class FontManager(object):
         setattr(self, weight, filename)
 
 
-class Text(pg.sprite.Sprite):
+class Text(pygame.sprite.Sprite):
     def __init__(
         self,
         text,
@@ -53,9 +53,9 @@ class Text(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def _init_fonts(self):
-        self.font = pg.font.Font(self.font_file, self.size)
-        # self.bold_font = pg.font.Font(self.bold_font_file, self.size)
-        # self.italic_font = pg.font.Font(self.italic_font_file, self.size)
+        self.font = pygame.font.Font(self.font_file, self.size)
+        # self.bold_font = pygame.font.Font(self.bold_font_file, self.size)
+        # self.italic_font = pygame.font.Font(self.italic_font_file, self.size)
 
     def _render(self, lines, font, color):
         if not isinstance(lines, list):
@@ -69,7 +69,7 @@ class Text(pg.sprite.Sprite):
             index += 1
         surface_width = max([x["size"][0] for x in renders])
         surface_height = sum([x["size"][1] for x in renders])
-        surface = pg.Surface((surface_width, surface_height))
+        surface = pygame.Surface((surface_width, surface_height))
         left, top = (0, 0)
         for render in renders:
             width, height = render["size"]
@@ -109,6 +109,8 @@ class Text(pg.sprite.Sprite):
         italic=None,
         underline=None,
         strikethrough=None,
+        *args,
+        **kwargs
     ):
         # Check if the font size attribute has changed since the last time the Font objects were initialized. If so, we need to re-initialize the Font objects
         if text is not None:
@@ -140,8 +142,8 @@ class Text(pg.sprite.Sprite):
         font.strikethrough = self.strikethrough
         self.image = self._render(text.split("\n"), font, self.color)
 
-    def update(self):
-        self.render()
+    def update(self, *args, **kwargs):
+        self.render(**kwargs)
 
 
 class TargetedText(Text):
@@ -151,8 +153,8 @@ class TargetedText(Text):
         self.angle = angle
         self.offset = offset
 
-    def update(self):
-        super().update()
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
         r0 = self.target.rect
         x0, y0 = r0.center
         w0, h0 = r0.size

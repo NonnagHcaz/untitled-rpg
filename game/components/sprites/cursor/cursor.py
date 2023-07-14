@@ -1,4 +1,4 @@
-import pygame as pg
+import pygame
 
 from game.components.sprites.sprite import Sprite
 
@@ -41,5 +41,5 @@ class Cursor(Sprite):
         return collisions
 
     def update(self):
-        self.pos = pg.mouse.get_pos()
+        self.pos = pygame.mouse.get_pos()
         self.rect.center = self.pos
