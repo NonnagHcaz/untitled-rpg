@@ -21,6 +21,12 @@ class GameState(object):
         self.total_frames = 0
         self.blink = False
         self.timer = 0.0
+        self.zoom = 1.0
+
+        self.game = game
+        self.asset_cache = asset_cache
+        self.previous_state = None
+        self.next_state = None
 
     def get_event(self, event):
         """Processes events that were passed from the main event loop.
