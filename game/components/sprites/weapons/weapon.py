@@ -1,5 +1,5 @@
 import math
-import pygame as pg
+import pygame
 from .defaults import *
 from ..sprite import Sprite, MovableSprite
 

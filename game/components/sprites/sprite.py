@@ -1,4 +1,4 @@
-import pygame as pg
+import pygame
 from .defaults import *
 from enum import Enum
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 BLINK_MOD = 30
 
 
-class Sprite(pg.sprite.Sprite):
+class Sprite(pygame.sprite.Sprite):
     is_player = False
     is_enemy = False
     is_npc = False
@@ -34,7 +34,7 @@ class Sprite(pg.sprite.Sprite):
         self.pos = (None, None)
         self._layer = 0
         if not self.image:
-            self.rect = pg.Rect((0, 0, 0, 0))
+            self.rect = pygame.Rect((0, 0, 0, 0))
         else:
             self.rect = self.image.get_rect()
         self._image = self.image
@@ -87,22 +87,22 @@ class Sprite(pg.sprite.Sprite):
     def interact(self, other):
         pass
 
-    def flip(self):
+    def flip(self, flip_x=True, flip_y=False):
         center = self.rect.center
-        self.image = pg.transform.flip(self.image.copy(), True, False)
+        self.image = pygame.transform.flip(self.image.copy(), flip_x, flip_y)
         self.rect = self.image.get_rect()
         self.rect.center = center
         return self.image
 
     def rotate(self, angle):
         center = self.rect.center
-        self.image = pg.transform.rotozoom(self.image.copy(), angle, 1)
+        self.image = pygame.transform.rotozoom(self.image.copy(), angle, 1)
         self.rect = self.image.get_rect()
         self.rect.center = center
         return self.image
 
     def draw_hitbox(self):
-        pg.draw.polygon(self.image, pg.Color("red"), self.vertices)
+        pygame.draw.polygon(self.image, pygame.Color("red"), self.vertices)
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
@@ -113,7 +113,7 @@ class Sprite(pg.sprite.Sprite):
             if self.blink_timer % BLINK_MOD:
                 self.image = self.original_image
             else:
-                self.image = pg.Surface(self.rect.size)
+                self.image = pygame.Surface(self.rect.size)
                 self.image.fill(self.blink_color)
             self.blink_timer = max(0, self.blink_timer - 1)
             if not self.blink_timer:
@@ -143,7 +143,7 @@ class Sprite(pg.sprite.Sprite):
         return True
 
     def check_collision(self, other):
-        return pg.sprite.collide_rect(self.rect, other.rect)
+        return pygame.sprite.collide_rect(self.rect, other.rect)
 
     def check_collisions(self, others):
         return [self.check_collision(other) for other in others]
@@ -177,7 +177,7 @@ class MergedSprite(Sprite):
             rect.union_ip(sprite.rect)
 
         # Create a new transparent image with the combined size.
-        image = pg.Surface(rect.size, pg.SRCALPHA)
+        image = pygame.Surface(rect.size, pygame.SRCALPHA)
         # Now blit all sprites onto the new surface.
         for sprite in sprites:
             image.blit(

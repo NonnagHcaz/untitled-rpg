@@ -1,6 +1,6 @@
-import pygame as pg
+import pygame
 
-BASEID = pg.USEREVENT + 1
+BASEID = pygame.USEREVENT + 1
 CUSTOM_EVENT_TYPE_POOL_SIZE = 100
 CUSTOM_EVENT_TYPES = ["WORLD", "PLAYER", "ENEMY", "EFFECT"]
 

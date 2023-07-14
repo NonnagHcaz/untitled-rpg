@@ -1,4 +1,4 @@
-import pygame as pg
+import pygame
 import math
 
 from game.components.sprites.sprite import Sprite
@@ -9,12 +9,12 @@ class Shape(Sprite):
         self,
         width=0,
         height=0,
-        primary_color=pg.Color("white"),
-        secondary_color=pg.Color("black"),
-        tertiary_color=pg.Color("black"),
-        border_color=pg.Color("black"),
+        primary_color=pygame.Color("white"),
+        secondary_color=pygame.Color("black"),
+        tertiary_color=pygame.Color("black"),
+        border_color=pygame.Color("black"),
         border_width=0,
-        alpha=pg.SRCALPHA,
+        alpha=pygame.SRCALPHA,
         *args,
         **kwargs,
     ):
@@ -28,7 +28,7 @@ class Shape(Sprite):
         self.border_width = border_width
         self.alpha = alpha
 
-        self.image = pg.Surface((self.width, self.height), self.alpha)
+        self.image = pygame.Surface((self.width, self.height), self.alpha)
         self.rect = self.image.get_rect()
         self.draw()
 
@@ -42,12 +42,12 @@ class Polygon(Shape):
         sides=4,
         width=0,
         height=0,
-        primary_color=pg.Color("white"),
-        secondary_color=pg.Color("black"),
-        tertiary_color=pg.Color("black"),
-        border_color=pg.Color("black"),
+        primary_color=pygame.Color("white"),
+        secondary_color=pygame.Color("black"),
+        tertiary_color=pygame.Color("black"),
+        border_color=pygame.Color("black"),
         border_width=0,
-        alpha=pg.SRCALPHA,
+        alpha=pygame.SRCALPHA,
         *args,
         **kwargs,
     ):
@@ -81,8 +81,10 @@ class Polygon(Shape):
         return vertices
 
     def draw(self):
-        pg.draw.polygon(self.image, self.border_color, self.vertices, self.border_width)
-        # pg.draw.polygon(self.image, self.primary_color, self.vertices)
+        pygame.draw.polygon(
+            self.image, self.border_color, self.vertices, self.border_width
+        )
+        # pygame.draw.polygon(self.image, self.primary_color, self.vertices)
 
 
 class Hitbox(Polygon):
@@ -95,9 +97,9 @@ class Hitbox(Polygon):
         primary_color=(0, 0, 0, 0),
         secondary_color=(0, 0, 0, 0),
         tertiary_color=(0, 0, 0, 0),
-        border_color=pg.Color("red"),
+        border_color=pygame.Color("red"),
         border_width=3,
-        alpha=pg.SRCALPHA,
+        alpha=pygame.SRCALPHA,
         *args,
         **kwargs,
     ):
@@ -134,12 +136,12 @@ class Crosshair(Shape):
         self,
         width=0,
         height=0,
-        primary_color=pg.Color("white"),
-        secondary_color=pg.Color("black"),
-        tertiary_color=pg.Color("black"),
-        border_color=pg.Color("black"),
+        primary_color=pygame.Color("white"),
+        secondary_color=pygame.Color("black"),
+        tertiary_color=pygame.Color("black"),
+        border_color=pygame.Color("black"),
         border_width=0,
-        alpha=pg.SRCALPHA,
+        alpha=pygame.SRCALPHA,
         *args,
         **kwargs,
     ):

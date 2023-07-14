@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-import pygame as pg
+import pygame
 
 
 # class StatusBar(object):
@@ -67,7 +67,7 @@ class Player(Entity):
     def _draw_bar(self, surface, order, height, color, value, max_value):
         top = self.rect.top - order * (1 + height)
         _mod = 1
-        _rect = pg.Rect(
+        _rect = pygame.Rect(
             self.rect.left - self.rect.left * _mod,
             top,
             self.rect.width * 2 * _mod,
@@ -89,8 +89,8 @@ class Player(Entity):
 def draw_player_status_bar(
     surf, pos, size, border_color, background_color, progress_color, progress
 ):
-    pg.draw.rect(surf, background_color, (*pos, *size))
-    pg.draw.rect(surf, border_color, (*pos, *size), 1)
+    pygame.draw.rect(surf, background_color, (*pos, *size))
+    pygame.draw.rect(surf, border_color, (*pos, *size), 1)
     innerPos = (pos[0] + 1, pos[1] + 1)
     innerSize = ((size[0] - 2) * progress, size[1] - 2)
     rect = (
@@ -99,4 +99,4 @@ def draw_player_status_bar(
         round(innerSize[0]),
         round(innerSize[1]),
     )
-    pg.draw.rect(surf, progress_color, rect)
+    pygame.draw.rect(surf, progress_color, rect)

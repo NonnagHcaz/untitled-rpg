@@ -1,4 +1,4 @@
-import pygame as pg
+import pygame
 
 from game.components.sprites.shape.shape import Shape
 
@@ -9,12 +9,12 @@ class StatusBar(Shape):
         orientation=0,
         width=0,
         height=10,
-        primary_color=pg.Color("red"),
-        secondary_color=pg.Color("black"),
-        tertiary_color=pg.Color("black"),
-        border_color=pg.Color("white"),
+        primary_color=pygame.Color("red"),
+        secondary_color=pygame.Color("black"),
+        tertiary_color=pygame.Color("black"),
+        border_color=pygame.Color("white"),
         border_width=2,
-        alpha=pg.SRCALPHA,
+        alpha=pygame.SRCALPHA,
         *args,
         **kwargs,
     ):
@@ -98,25 +98,25 @@ class TargetedStatusBar(StatusBar):
 class HealthBar(TargetedStatusBar):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.border_color = pg.Color("white")
-        self.primary_color = pg.Color("red")
-        self.secondary_color = pg.Color("black")
+        self.border_color = pygame.Color("white")
+        self.primary_color = pygame.Color("red")
+        self.secondary_color = pygame.Color("black")
         self.border_width = 2
 
 
 class StaminaBar(TargetedStatusBar):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.border_color = pg.Color("white")
-        self.primary_color = pg.Color("green")
-        self.secondary_color = pg.Color("black")
+        self.border_color = pygame.Color("white")
+        self.primary_color = pygame.Color("green")
+        self.secondary_color = pygame.Color("black")
         self.border_width = 2
 
 
 class ManaBar(TargetedStatusBar):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.border_color = pg.Color("white")
-        self.primary_color = pg.Color("blue")
-        self.secondary_color = pg.Color("black")
+        self.border_color = pygame.Color("white")
+        self.primary_color = pygame.Color("blue")
+        self.secondary_color = pygame.Color("black")
         self.border_width = 2
