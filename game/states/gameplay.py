@@ -65,6 +65,7 @@ class Gameplay(GameState):
 
         self.enemies = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
+        self.player_sprites = pygame.sprite.Group()
         self.hitboxes = pygame.sprite.Group()
         self.status_bars = pygame.sprite.Group()
         self.texts = pygame.sprite.Group()
@@ -97,64 +98,8 @@ class Gameplay(GameState):
         self.floor = self.level.build_test_floor()
         self.walls = self.level.build_test_walls()
 
-        self.player = self.level.spawn_player()
-        self.player.debug = self.debug
+        self.respawn()
         # self.hitboxes.add(Hitbox(target=self.player))
-
-        i = 0
-        height = 10
-        offset = 5
-        offsets = [offset * (i + 1) + height * i for i in range(3)]
-
-        self.status_bars.add(
-            TargetedStatusBar(
-                target=self.player,
-                offset=offsets[0],
-                width=self.player.rect.width * 2,
-                primary_color=pygame.Color("red"),
-                secondary_color=pygame.Color("black"),
-                border_color=pygame.Color("white"),
-                border_width=2,
-                current_attribute="health",
-                max_attribute="base_health",
-            )
-        )
-        i += 1
-        self.status_bars.add(
-            TargetedStatusBar(
-                target=self.player,
-                offset=offsets[1],
-                width=self.player.rect.width * 2,
-                primary_color=pygame.Color("green"),
-                secondary_color=pygame.Color("black"),
-                border_color=pygame.Color("white"),
-                border_width=2,
-                current_attribute="stamina",
-                max_attribute="base_stamina",
-            )
-        )
-        self.status_bars.add(
-            TargetedStatusBar(
-                target=self.player,
-                offset=offsets[2],
-                width=self.player.rect.width * 2,
-                primary_color=pygame.Color("blue"),
-                secondary_color=pygame.Color("black"),
-                border_color=pygame.Color("white"),
-                border_width=2,
-                current_attribute="mana",
-                max_attribute="base_mana",
-            )
-        )
-        self.texts.add(
-            TargetedText(
-                target=self.player,
-                angle=-90,
-                font_file=self.font,
-                text={"func": self.player.diagnostics_pretty, "args": [self.cam]},
-                max_width=self.player.rect.width * 2,
-            )
-        )
 
         self.mp_line = pygame.sprite.Sprite()
 
@@ -202,7 +147,8 @@ class Gameplay(GameState):
         self.all_sprites.add(self.status_bars, layer=3)
         self.all_sprites.add(self.texts, layer=3)
         # self.all_sprites.add(self.cursor)
-        for sprite in [self.player]:
+        self.all_sprites.add(self.player_sprites)
+        for sprite in self.player_sprites:
             self.all_sprites.move_to_front(sprite)
 
     def cleanup(self):
@@ -334,14 +280,83 @@ class Gameplay(GameState):
                 enemy.blink()
                 enemy.health -= projectile.damage
 
-    def possess(self):
-        print("respawn")
+    def respawn(self):
+        for sprite in self.player_sprites:
+            sprite.kill()
+
+        self.player = self.level.spawn_player()
+        self.player.debug = self.debug
+
+        height = 10
+        offset = 5
+        offsets = [offset * (i + 1) + height * i for i in range(3)]
+
+        config = {
+            "target": self.player,
+            "width": self.player.rect.width * 2,
+            "secondary_color": pygame.Color("black"),
+            "border_color": pygame.Color("white"),
+            "border_width": 2,
+        }
+
+        health_config = {
+            "offset": offsets[0],
+            "primary_color": pygame.Color("red"),
+            "current_attribute": "health",
+            "max_attribute": "base_health",
+        }
+        health_config.update(config)
+        mana_config = {
+            "offset": offsets[1],
+            "primary_color": pygame.Color("blue"),
+            "current_attribute": "mana",
+            "max_attribute": "base_mana",
+        }
+        mana_config.update(config)
+        stamina_config = {
+            "offset": offsets[2],
+            "primary_color": pygame.Color("green"),
+            "current_attribute": "stamina",
+            "max_attribute": "base_stamina",
+        }
+        stamina_config.update(config)
+        health_bar = TargetedStatusBar(**health_config)
+        mana_bar = TargetedStatusBar(**mana_config)
+        stamina_bar = TargetedStatusBar(**stamina_config)
+
+        debug_text = TargetedText(
+            target=self.player,
+            angle=-90,
+            font_file=self.font,
+            text={"func": self.player.diagnostics_pretty, "args": [self.cam]},
+            max_width=self.player.rect.width * 2,
+        )
+
+        self.status_bars.add(health_bar, mana_bar, stamina_bar)
+        self.texts.add(debug_text)
+        self.player_sprites.add(
+            self.player, health_bar, mana_bar, stamina_bar, debug_text
+        )
+
         try:
-            self.all_sprites.target = random.choice([x for x in self.enemies])
-            self.real_player = self.player
-            self.player = self.all_sprites.target
+            self.all_sprites.add(self.player_sprites)
+        except Exception as ex:
+            logger.warning(
+                f"Couldn't add {self.player_sprites} to all_sprites: {str(ex)}"
+            )
+
+        try:
+            self.all_sprites.set_target(self.player)
+        except Exception as ex:
+            logger.warning(f"Couldn't set {self.player} as camera target: {str(ex)}")
+
+    def possess(self):
+        try:
+            self.real_player = self.player.copy()
+            self.player = random.choice([x for x in self.enemies])
+            self.all_sprites.target = self.player
         except IndexError:
-            pass
+            logger.warning("No more sprites to possess")
 
     def update(self, surface, current_time, dt):
         super().update(surface, current_time)
