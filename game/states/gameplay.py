@@ -68,8 +68,8 @@ class Gameplay(GameState):
         self.status_bars = pygame.sprite.Group()
         self.texts = pygame.sprite.Group()
 
-        level_width = 16 * 150
-        level_height = 9 * 150
+        level_width = 16 * 250
+        level_height = 9 * 250
 
         self.cursor = Cursor(
             name="cursor",
@@ -157,7 +157,7 @@ class Gameplay(GameState):
 
         self.mp_line = pygame.sprite.Sprite()
 
-        for _ in range(10):
+        for _ in range(self.level.width // 100):
             x = random.randint(int(self.level.width * 0.1), int(self.level.width * 0.9))
             y = random.randint(
                 int(self.level.height * 0.1), int(self.level.height * 0.9)
