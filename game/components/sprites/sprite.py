@@ -102,25 +102,27 @@ class Sprite(pygame.sprite.Sprite):
         return self.image
 
     def draw_hitbox(self):
-        pygame.draw.polygon(self.image, pygame.Color("red"), self.vertices)
+        pygame.draw.rect(self.image, pygame.Color("red"), self.rect, 3)
 
-    def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
+    def update(self, surface, camera=None):
+        cam = camera
+        self.draw()
 
-        if self.blink_timer or self.blink_persist:
-            if not hasattr(self, "original_image"):
-                self.original_image = self.image
-            if self.blink_timer % BLINK_MOD:
-                self.image = self.original_image
-            else:
-                self.image = pygame.Surface(self.rect.size)
-                self.image.fill(self.blink_color)
-            self.blink_timer = max(0, self.blink_timer - 1)
-            if not self.blink_timer:
-                if self.blink_persist:
-                    self.blink_timer = BLINK_MOD
-                else:
-                    delattr(self, "original_image")
+    def draw(self):
+        # if self.blink_timer or self.blink_persist:
+        #     if not hasattr(self, "original_image"):
+        #         self.original_image = self.image
+        #     if self.blink_timer % BLINK_MOD:
+        #         self.image = self.original_image
+        #     else:
+        #         self.image = pygame.Surface(self.rect.size)
+        #         self.image.fill(self.blink_color)
+        #     self.blink_timer = max(0, self.blink_timer - 1)
+        #     if not self.blink_timer:
+        #         if self.blink_persist:
+        #             self.blink_timer = BLINK_MOD
+        #         else:
+        #             delattr(self, "original_image")
 
         if self.debug:
             self.draw_hitbox()
@@ -231,8 +233,11 @@ class AnimatedSprite(Sprite):
             for x in range(bf):
                 yield None
 
-    def update(self, *args, **kwargs):
+    def update(self, surface, camera=None):
+        super().update(surface, camera)
         next(self.animation)
+        if self.debug:
+            self.draw_hitbox()
 
 
 class LivingSprite(Sprite):
