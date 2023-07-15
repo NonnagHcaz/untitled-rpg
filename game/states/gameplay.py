@@ -18,6 +18,7 @@ from pygame.locals import (
 
 from game.components.camera.camera import Camera, CameraAwareLayeredUpdates
 from game.components.sprites.cursor.cursor import Cursor
+from game.components.sprites.defaults import DEFAULT_ATTACK_COOLDOWN
 from game.components.sprites.shape.shape import Hitbox
 from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 
@@ -57,6 +58,7 @@ class Gameplay(GameState):
         # pygame.mixer.music.load(self.bgm)
         # pygame.mixer.music.play(-1)
         self.cam = Camera()
+        self.attack_cooldown_timer = 0
 
         self.bgm = None
         self.font = None
@@ -217,22 +219,40 @@ class Gameplay(GameState):
             self.cam.zoom_in()
 
         self.zoom = self.cam.zoom_level
-
+        player_offset = (
+            pygame.Vector2(self.cursor.pos) - pygame.Vector2(self.player.pos) + self.cam
+        )
+        dx = self.cursor.x - self.all_sprites.target.x
+        dy = self.cursor.y - self.all_sprites.target.y
+        # print(dx, dy)
+        angle = math.degrees(math.atan2(dy, dx))
         if self.player.x + self.cam.x < self.cursor.x:
             self.player.direction = self.player.Direction.EAST
         else:
             self.player.direction = self.player.Direction.WEST
 
-        if pressed_btns[0]:
-            cursor_collides = self.cursor.collide(self.enemies)
-            for sprite in cursor_collides:
-                sprite.blink()
-            else:
-                if len(self.projectiles) < 20:
-                    sprite = self.level.spawn_orb(self.player.pos, self.cursor.pos)
-                    self.projectiles.add(sprite)
-                    self.all_sprites.add(sprite)
-                    self.all_sprites.move_to_front(sprite)
+        if pressed_btns[0]:  # left click
+            print("left click")
+            # cursor_collides = self.cursor.collide(self.enemies)
+            # for sprite in cursor_collides:
+            #     sprite.blink()
+            if len(self.projectiles) < 20 and not self.attack_cooldown_timer:
+                sprite = self.level.spawn_orb("orb", self.player, angle)
+                self.player_projectiles.add(sprite)
+                self.projectiles.add(sprite)
+                self.all_sprites.add(sprite)
+                self.all_sprites.move_to_front(sprite)
+                self.attack_cooldown_timer += getattr(
+                    self.player, "attack_cooldown", DEFAULT_ATTACK_COOLDOWN
+                )
+        elif pressed_btns[1]:  # middle mouse button
+            print("middle mouse click")
+        elif pressed_btns[2]:  # right click
+            print("right click")
+        elif pressed_btns[3]:
+            print("next btn")
+        elif pressed_btns[4]:
+            print("back btn")
 
         # if pressed_btns[0]:  # and pygame.MOUSEBUTTONUP in [x.type for x in events]:
 
@@ -256,6 +276,8 @@ class Gameplay(GameState):
             if not self.player.is_idle:
                 self.player.counter = 0
                 self.player.is_idle = True
+
+        self.attack_cooldown_timer = max(0, self.attack_cooldown_timer - 1)
 
     def check_collisions(self):
         player_enemies = pygame.sprite.spritecollide(

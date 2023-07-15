@@ -138,44 +138,58 @@ class Level(object):
 
         return self.spawn_sprite(random.choice(choices), pos, is_enemy=True)
 
-    def spawn_projectile(self, name, cam_pos, mouse_pos, image=None):
+    def spawn_projectile(self, name, origin, angle, image=None):
         if image is None:
             image = self.cache[(self.spritesheets["0x72d2"], name)]
-        dx = mouse_pos[0] - cam_pos[0]
-        dy = mouse_pos[1] - cam_pos[1]
-        m = dy / dx
-        angle = math.degrees(math.atan2(dy, dx))
-        x = cam_pos[0] + 10
-        y = m * x + 10
+        x, y = origin.rect.center
         sprite = Projectile(name=name, image=image, angle=angle)
         sprite.spawn(pos=(x, y))
         # sprite.spawn(x=self.width//2, y=self.height//2)
         return sprite
 
-    def spawn_orb(self, cam_pos, mouse_pos, color=None, radius=8, border_width=0):
+    def spawn_orb(
+        self,
+        name,
+        origin,
+        angle,
+        color=None,
+        radius=4,
+        border_color=pygame.Color("black"),
+        border_width=1,
+    ):
         name = "weapon_orb"
-        image = pygame.Surface((16, 16), pygame.SRCALPHA)
-        if color is None:
-            r = random.randint(0, 255)
-            g = random.randint(0, 255)
-            b = random.randint(0, 255)
+        image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+        # image.fill()
+        if not color:
+            r = random.randint(50, 255)
+            g = random.randint(50, 255)
+            b = random.randint(50, 255)
             color = (r, g, b)
+        if not border_color:
+            r = random.randint(50, 255)
+            g = random.randint(50, 255)
+            b = random.randint(50, 255)
+            border_color = (r, g, b)
+        if border_width:
+            pygame.draw.circle(
+                surface=image,
+                color=border_color,
+                center=(radius, radius),
+                radius=radius,
+                width=border_width,
+            )
         pygame.draw.circle(
-            surface=image,
-            color=color,
-            center=mouse_pos,
-            radius=radius,
-            width=border_width,
+            surface=image, color=color, center=(radius, radius), radius=radius
         )
 
-        return self.spawn_projectile(name, cam_pos, mouse_pos, image)
+        return self.spawn_projectile(name, origin, angle, image)
 
-    def spawn_arrow(self, cam_pos, mouse_pos):
+    def spawn_arrow(self, origin, angle):
         name = "weapon_arrow"
         image = self.cache[(self.spritesheets["0x72d2"], name)]
 
         # sprite.spawn(x=self.width//2, y=self.height//2)
-        return self.spawn_projectile(name, cam_pos, mouse_pos, image)
+        return self.spawn_projectile(name, origin, angle, image)
 
     def spawn_player(self):
         return self.spawn_male_wizzard(is_player=True)
