@@ -29,4 +29,3 @@ Credit
 - [@ggbot](https://ggbot.itch.io/)
     - https://ggbot.itch.io/pixeloid-font
 
-- https://fonts.google.com/specimen/Roboto
