@@ -43,12 +43,15 @@ class Sprite(pygame.sprite.Sprite):
         self.blink_color = (255, 255, 255)
         self.blink_persist = False
 
-    def diagnostics_pretty(self):
+    def diagnostics_pretty(self, cam=None):
         n = self.name
         c = self.__class__
         r = self.rect
         d = self.direction
-        msg = f"name: {n}\npos: {r.center}, {d}\nsize: {r.size}\ndebug: {self.debug}"
+        fake_pos = None
+        if cam:
+            fake_pos = r.center - cam
+        msg = f"name: {n}\nreal pos: {r.center}\nfake pos: {fake_pos}\n{d}\nsize: {r.size}\ndebug: {self.debug}"
         return msg
 
     @property
