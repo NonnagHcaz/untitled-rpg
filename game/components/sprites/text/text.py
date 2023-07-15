@@ -169,6 +169,8 @@ class TargetedText(Text):
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
+        if not self.target.alive():
+            self.kill()
         r0 = self.target.rect
         x0, y0 = r0.center
         w0, h0 = r0.size

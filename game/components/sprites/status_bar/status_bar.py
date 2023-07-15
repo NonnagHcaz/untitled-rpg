@@ -82,6 +82,8 @@ class TargetedStatusBar(StatusBar):
         self.max_attribute = max_attribute
 
     def update(self, *args, **kwargs):
+        if not self.target.alive():
+            self.kill()
         _c = getattr(self.target, self.current_attribute, 1)
         _m = getattr(self.target, self.max_attribute, 1)
         p = _c / _m
