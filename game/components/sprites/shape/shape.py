@@ -30,9 +30,9 @@ class Shape(Sprite):
 
         self.image = pygame.Surface((self.width, self.height), self.alpha)
         self.rect = self.image.get_rect()
-        self.draw()
 
     def draw(self):
+        super().draw()
         self.image.fill((0, 0, 0, 0))
 
 
@@ -81,6 +81,7 @@ class Polygon(Shape):
         return vertices
 
     def draw(self):
+        super().draw()
         pygame.draw.polygon(
             self.image, self.border_color, self.vertices, self.border_width
         )
