@@ -65,7 +65,10 @@ class Gameplay(GameState):
 
         self.enemies = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
+        self.enemy_projectiles = pygame.sprite.Group()
+        self.player_projectiles = pygame.sprite.Group()
         self.player_sprites = pygame.sprite.Group()
+        self.projectiles.add(self.player_projectiles, self.enemy_projectiles)
         self.hitboxes = pygame.sprite.Group()
         self.status_bars = pygame.sprite.Group()
         self.texts = pygame.sprite.Group()
@@ -258,22 +261,22 @@ class Gameplay(GameState):
         player_enemies = pygame.sprite.spritecollide(
             self.player, self.enemies, dokill=False
         )
-        player_projectiles = pygame.sprite.spritecollide(
-            self.player, self.projectiles, dokill=False
+        player_enemy_projectile_collisions = pygame.sprite.spritecollide(
+            self.player, self.enemy_projectiles, dokill=False
         )
 
         for enemy in player_enemies:
             self.player.blink()
             self.player.health -= enemy.damage
-        for projectile in player_projectiles:
+        for projectile in player_enemy_projectile_collisions:
             self.player.blink()
             self.player.health -= projectile.damage
 
         for enemy in self.enemies:
-            enemy_projectiles = pygame.sprite.spritecollide(
+            enemy_projectile_collisions = pygame.sprite.spritecollide(
                 enemy, self.projectiles, dokill=False
             )
-            for projectile in enemy_projectiles:
+            for projectile in enemy_projectile_collisions:
                 enemy.blink()
                 enemy.health -= projectile.damage
 
