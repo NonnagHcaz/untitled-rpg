@@ -219,20 +219,20 @@ class Gameplay(GameState):
             self.cam.zoom_in()
 
         self.zoom = self.cam.zoom_level
-        player_offset = (
-            pygame.Vector2(self.cursor.pos) - pygame.Vector2(self.player.pos) + self.cam
-        )
-        dx = self.cursor.x - self.all_sprites.target.x
-        dy = self.cursor.y - self.all_sprites.target.y
+        start_vector = pygame.Vector2(self.player.pos) + self.cam
+        end_vector = self.cursor.pos
+        dx = end_vector[0] - start_vector[0]
+        dy = end_vector[1] - start_vector[1]
+
         # print(dx, dy)
-        angle = math.degrees(math.atan2(dy, dx))
-        if self.player.x + self.cam.x < self.cursor.x:
+        angle = math.degrees(math.atan2(-dy, dx)) % 360
+
+        if start_vector[0] < end_vector[0]:
             self.player.direction = self.player.Direction.EAST
         else:
             self.player.direction = self.player.Direction.WEST
 
         if pressed_btns[0]:  # left click
-            print("left click")
             # cursor_collides = self.cursor.collide(self.enemies)
             # for sprite in cursor_collides:
             #     sprite.blink()
@@ -246,13 +246,13 @@ class Gameplay(GameState):
                     self.player, "attack_cooldown", DEFAULT_ATTACK_COOLDOWN
                 )
         elif pressed_btns[1]:  # middle mouse button
-            print("middle mouse click")
+            pass
         elif pressed_btns[2]:  # right click
-            print("right click")
-        elif pressed_btns[3]:
-            print("next btn")
-        elif pressed_btns[4]:
-            print("back btn")
+            pass
+        elif pressed_btns[3]:  # back btn
+            pass
+        elif pressed_btns[4]:  # next btn
+            pass
 
         # if pressed_btns[0]:  # and pygame.MOUSEBUTTONUP in [x.type for x in events]:
 

@@ -62,12 +62,12 @@ class Wand(MagicWeapon):
 class Projectile(CombatantSprite, MovableSprite):
     def __init__(self, angle, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.angle = angle
+        self.angle = math.radians(angle)  # Convert angle to radians
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         _x = self.speed * math.cos(self.angle)
-        _y = self.speed * math.sin(self.angle)
+        _y = -self.speed * math.sin(self.angle)
         self.rect.move_ip(_x, _y)
 
         self.health -= 1
