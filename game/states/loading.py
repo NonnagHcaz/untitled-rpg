@@ -17,16 +17,33 @@ class LoadState(GameState):
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
 
+
+class IntermediateState(LoadState):
+    def __init__(self, game, asset_cache):
+        super().__init__(game, asset_cache)
+
+
+class StartupState(LoadState):
+    def __init__(self, game, asset_cache):
+        super().__init__(game, asset_cache)
+
         self.assets = [
-            # ("image", SPRITESHEET),
-            # ("image", "path/to/image2.png"),
-            ("font", os.path.join("assets", "fonts", "PixeloidSans.ttf"), 24),
-            # ("sound", "path/to/sound.wav"),
-            # Add more assets to load
+            ("font", filepath, 24)
+            for filepath in utils.get_filepaths(config.FONT_DIR, *config.FONT_ACCEPTS)
         ]
         self.assets += [
             ("image", filepath)
             for filepath in utils.get_filepaths(config.GFX_DIR, *config.IMAGE_ACCEPTS)
+        ]
+
+        self.assets += [
+            ("sound", filepath)
+            for filepath in utils.get_filepaths(config.SFX_DIR, *config.SOUND_ACCEPTS)
+        ]
+
+        self.assets += [
+            ("sound", filepath)
+            for filepath in utils.get_filepaths(config.MUSIC_DIR, *config.SOUND_ACCEPTS)
         ]
 
         self.mappers = utils.get_filepaths(config.GFX_DIR, ".txt")
@@ -35,9 +52,6 @@ class LoadState(GameState):
 
         self.loaded_assets = 0
         self.wait = False
-
-    def cleanup(self):
-        return super().cleanup()
 
     def get_event(self, event):
         """Get events from Control. Currently changes to next state on any key

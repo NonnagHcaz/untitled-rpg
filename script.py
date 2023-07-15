@@ -7,7 +7,7 @@ from game.states.menu import MenuState, PauseState
 logging.basicConfig(level=logging.DEBUG)  # , filename='debug.log', filemode='w')
 
 from game.game import Game
-from game.states import Gameplay, SplashState, LoadState
+from game.states import Gameplay, SplashState, StartupState
 
 if __name__ == "__main__":
     game = Game()
@@ -15,12 +15,12 @@ if __name__ == "__main__":
     states = {
         "SPLASH": SplashState(**config),
         "GAME": Gameplay(**config),
-        "START": LoadState(**config),
+        "STARTUP": StartupState(**config),
         "MENU": MenuState(**config),
         "PAUSE": PauseState(**config),
     }
-    states["START"].next_state = "SPLASH"
+    states["STARTUP"].next_state = "SPLASH"
     states["SPLASH"].next_state = "MENU"
 
-    game.setup_states(states, "START")
+    game.setup_states(states, "STARTUP")
     game.run()
