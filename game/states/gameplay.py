@@ -212,6 +212,10 @@ class Gameplay(GameState):
     def get_event(self, event):
         if event.type == pygame.QUIT:
             self.quit = True
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_ESCAPE:
+                self.next_state = "PAUSE"
+                self.done = True
 
     def handle_controls(self):
         if not self.player:
