@@ -27,8 +27,8 @@ from game.components.sprites.text.text import TargetedText
 from game.level import Dungeon
 
 from game.states.state import GameState
-from game.utils.asset_cache import AssetCache, _fn
-from game.utils.controls.controls import Controls
+from game.utils.asset_cache import _fn
+from game.utils.controls import Controls
 
 logger = logging.getLogger(__name__)
 

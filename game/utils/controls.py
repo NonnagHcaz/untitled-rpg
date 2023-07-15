@@ -1,9 +1,9 @@
 import os
 import json
 
-from .defaults import DEFAULT_KEYMAP, DEFAULT_FILENAME
-
 import logging
+
+from game.config import DEFAULT_FILENAME, DEFAULT_KEYMAP
 
 logger = logging.getLogger(__name__)
 
