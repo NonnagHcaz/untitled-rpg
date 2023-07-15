@@ -29,3 +29,6 @@ Credit
 - [@ggbot](https://ggbot.itch.io/)
     - https://ggbot.itch.io/pixeloid-font
 
+- [@safwyl](https://safwyl.itch.io/)
+    - https://safwyl.itch.io/16x16-dungeon-autotile-remix
+
