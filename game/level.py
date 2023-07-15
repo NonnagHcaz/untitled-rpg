@@ -142,7 +142,9 @@ class Level(object):
         if image is None:
             image = self.cache[(self.spritesheets["0x72d2"], name)]
         x, y = origin.rect.center
-        sprite = Projectile(name=name, image=image, angle=angle, walk_speed=10)
+        sprite = Projectile(
+            name=name, image=image, angle=angle, walk_speed=10, damage=10
+        )
         sprite.spawn(pos=(x, y))
         # sprite.spawn(x=self.width//2, y=self.height//2)
         return sprite
