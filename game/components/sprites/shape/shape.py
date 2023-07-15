@@ -88,48 +88,39 @@ class Polygon(Shape):
         # pygame.draw.polygon(self.image, self.primary_color, self.vertices)
 
 
-class Hitbox(Polygon):
+class Hitbox(Shape):
     def __init__(
         self,
         target,
-        sides=4,
         width=0,
         height=0,
-        primary_color=(0, 0, 0, 0),
-        secondary_color=(0, 0, 0, 0),
-        tertiary_color=(0, 0, 0, 0),
-        border_color=pygame.Color("red"),
-        border_width=3,
+        primary_color=pygame.Color("white"),
+        secondary_color=pygame.Color("black"),
+        tertiary_color=pygame.Color("black"),
+        border_color=pygame.Color("black"),
+        border_width=0,
         alpha=pygame.SRCALPHA,
         *args,
         **kwargs,
     ):
         self.target = target
-        if not width:
-            width = self.target.rect.width
-        if not height:
-            height = self.target.rect.height
+        _width, _height = self.target.rect.size
         super().__init__(
-            sides=sides,
-            width=width,
-            height=height,
-            primary_color=primary_color,
-            secondary_color=secondary_color,
-            tertiary_color=tertiary_color,
-            border_color=border_color,
-            border_width=border_width,
-            alpha=alpha,
+            width or _width,
+            height or _height,
+            primary_color,
+            secondary_color,
+            tertiary_color,
+            border_color,
+            border_width,
+            alpha,
             *args,
             **kwargs,
         )
 
-    # @property
-    # def vertices(self):
-    #     l, t, w, h = self.rect
-    #     return [(l, t), (l + w, t), (l + w, t + h), (l, t + h)]
-
-    def update(self):
-        self.rect.center = self.target.rect.center
+    def update(self, *args, **kwargs):
+        self.rect = self.target.rect
+        super().update(*args, **kwargs)
 
 
 class Crosshair(Shape):
