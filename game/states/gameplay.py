@@ -53,6 +53,7 @@ class Gameplay(GameState):
 
     def startup(self, current_time, persistent, surface):
         super().startup(current_time, persistent, surface)
+        pygame.mouse.set_visible(False)
         # pygame.mixer.music.load(self.bgm)
         # pygame.mixer.music.play(-1)
         self.cam = Camera()
@@ -207,6 +208,7 @@ class Gameplay(GameState):
     def cleanup(self):
         """Stop the music when scene is done."""
         # pygame.mixer.music.stop()
+        pygame.mouse.set_visible(True)
         return super().cleanup()
 
     def get_event(self, event):
