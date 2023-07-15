@@ -129,7 +129,7 @@ class MenuState(GameState):
             ("Load Game", self.load_game),
             ("Exit", self.exit_game),
         ]
-        self.heading_text = "Menu"
+        self.heading_text = config.CAPTION
         self.button_padding = (10, 5)
         self.button_margin = 5
 
