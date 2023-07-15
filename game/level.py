@@ -161,14 +161,14 @@ class Level(object):
         image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
         # image.fill()
         if not color:
-            r = random.randint(50, 255)
-            g = random.randint(50, 255)
-            b = random.randint(50, 255)
+            r = random.randint(0, 255)
+            g = random.randint(0, 255)
+            b = random.randint(0, 255)
             color = (r, g, b)
         if not border_color:
-            r = random.randint(50, 255)
-            g = random.randint(50, 255)
-            b = random.randint(50, 255)
+            r = random.randint(0, 255)
+            g = random.randint(0, 255)
+            b = random.randint(0, 255)
             border_color = (r, g, b)
         if border_width:
             pygame.draw.circle(
