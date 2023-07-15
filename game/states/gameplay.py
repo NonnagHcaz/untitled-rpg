@@ -160,10 +160,17 @@ class Gameplay(GameState):
     def get_event(self, event):
         if event.type == pygame.QUIT:
             self.quit = True
-        if event.type == pygame.KEYUP:
+        elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 self.next_state = "PAUSE"
                 self.done = True
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_k:
+                self.player.kill()
+            elif event.key == pygame.K_r:
+                self.respawn()
+            elif event.key == pygame.K_p:
+                self.possess()
 
     def handle_controls(self):
         if not self.player:
@@ -172,16 +179,6 @@ class Gameplay(GameState):
         controls = self.controls
         pressed_keys = pygame.key.get_pressed()
         pressed_btns = pygame.mouse.get_pressed(num_buttons=5)
-
-        if pressed_keys[pygame.K_ESCAPE]:
-            self.next_state = "PAUSE"
-            self.game.flip_state()
-
-        if pressed_keys[pygame.K_k]:
-            self.player.kill()
-
-        if pressed_keys[pygame.K_r]:
-            self.possess()
 
         if controls.pressed_sprint_hold(pressed_keys, pressed_btns):
             self.player.is_crouching = 0
