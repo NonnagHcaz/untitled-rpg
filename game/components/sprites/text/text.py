@@ -110,7 +110,7 @@ class Text(pygame.sprite.Sprite):
         underline=None,
         strikethrough=None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         # Check if the font size attribute has changed since the last time the Font objects were initialized. If so, we need to re-initialize the Font objects
         if text is not None:
@@ -128,6 +128,20 @@ class Text(pygame.sprite.Sprite):
 
         if isinstance(self.text, str):
             text = self.text
+        elif isinstance(self.text, dict):
+            _func = self.text["func"]
+            _args = self.text.get("args")
+            _kwargs = self.text.get("kwargs")
+            if (_args and not isinstance(_args, list)) or (
+                _kwargs and not isinstance(_kwargs, dict)
+            ):
+                raise f"Invalid text configuration: {self.text}"
+            if _args and _kwargs:
+                text = _func(*_args, **_kwargs)
+            elif _args:
+                text = _func(*_args)
+            else:
+                text = _func(**_kwargs)
         else:
             text = self.text()
 
