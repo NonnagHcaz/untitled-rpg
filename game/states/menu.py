@@ -141,11 +141,14 @@ class MenuState(GameState):
         self.all_sprites = Group()
         self.buttons = Group()
 
-        self.current_button_index = 0
-
     def startup(self, current_time, persistant, surface):
+        self.current_button_index = 0  # reset focused button
         self.create_menu_elements()
         return super().startup(current_time, persistant, surface)
+
+    def cleanup(self):
+        self.current_button_index = 0  # reset focused button
+        return super().cleanup()
 
     def create_menu_elements(self):
         heading_font = pygame.font.Font(self.font_file, self.heading_font_size)
