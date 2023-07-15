@@ -16,7 +16,6 @@ class SplashState(GameState):
 
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
-        self.next = "GAME"
         self.timeout = 5
 
     def startup(self, current_time, persistant, surface):

@@ -30,6 +30,6 @@ SOUND_ACCEPTS = (".wav", ".mp3", ".ogg", ".mdi")
 
 ASSETS_DIR = "assets"
 GFX_DIR = os.path.join(ASSETS_DIR, "graphics")
-FONTS_DIR = os.path.join(ASSETS_DIR, "fonts")
+FONT_DIR = os.path.join(ASSETS_DIR, "fonts")
 SFX_DIR = os.path.join(ASSETS_DIR, "sound")
 MUSIC_DIR = os.path.join(ASSETS_DIR, "music")
