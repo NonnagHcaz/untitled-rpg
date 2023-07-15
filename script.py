@@ -1,10 +1,11 @@
 import sys
-
+import os
 import logging
 from game import config
 from game.states.menu import MenuState, PauseState
 
-logging.basicConfig(level=logging.DEBUG)  # , filename='debug.log', filemode='w')
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(filename="logs/debug.log", filemode="w")
 
 from game.game import Game
 from game.states import Gameplay, SplashState, StartupState
