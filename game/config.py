@@ -4,6 +4,38 @@ This module initializes the display and creates dictionaries of resources.
 
 import os
 
+import pygame
+from pygame.locals import (
+    K_ESCAPE,
+    K_RETURN,
+    K_UP,
+    K_LEFT,
+    K_DOWN,
+    K_RIGHT,
+    K_CAPSLOCK,
+    K_w,
+    K_a,
+    K_s,
+    K_d,
+    K_f,
+    K_e,
+    K_q,
+    K_c,
+    K_x,
+    K_i,
+    K_q,
+    K_TAB,
+    K_SPACE,
+    K_LSHIFT,
+    K_LCTRL,
+    K_RSHIFT,
+    K_RCTRL,
+    K_F5,
+    K_F9,
+    K_F1,
+)
+
+
 SCREEN_SIZES = {
     # "nHD": (640, 360),
     # "FWVGA": (854, 480),
@@ -35,43 +67,18 @@ SFX_DIR = os.path.join(ASSETS_DIR, "sound")
 MUSIC_DIR = os.path.join(ASSETS_DIR, "music")
 
 
-from pygame.locals import (
-    K_ESCAPE,
-    K_RETURN,
-    K_UP,
-    K_LEFT,
-    K_DOWN,
-    K_RIGHT,
-    K_CAPSLOCK,
-    K_w,
-    K_a,
-    K_s,
-    K_d,
-    K_f,
-    K_e,
-    K_q,
-    K_c,
-    K_x,
-    K_i,
-    K_q,
-    K_TAB,
-    K_SPACE,
-    K_LSHIFT,
-    K_LCTRL,
-    K_RSHIFT,
-    K_RCTRL,
-    K_F5,
-    K_F9,
-    K_F1,
-)
-
 M_BUTTON1 = -5
 M_BUTTON2 = M_BUTTON1 + 1
 M_BUTTON3 = M_BUTTON2 + 1
 M_BUTTON4 = M_BUTTON3 + 1
 M_BUTTON5 = M_BUTTON4 + 1
 
-DEFAULT_FILENAME = "data/conf/controls.json"
+CONFIGURATION_FILE = "data/conf/conf.ini"
+CONTROLS_FILE = "data/conf/controls.json"
+AUTOSAVE_FILE = "data/saves/autosave.dat"
+SAVE_FILE = "data/saves/save.dat"
+DISPLAY_FILE = "data/conf/display.json"
+SOUND_FILE = "data/conf/sound.json"
 
 # region Movement Keys
 

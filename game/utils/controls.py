@@ -3,7 +3,7 @@ import json
 
 import logging
 
-from game.config import DEFAULT_FILENAME, DEFAULT_KEYMAP
+from game.config import CONTROLS_FILE, DEFAULT_KEYMAP
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ class _Binding:
 
 
 class Controls:
-    def __init__(self, filename=DEFAULT_FILENAME):
+    def __init__(self, filename=CONTROLS_FILE):
         logger.debug(f"Initializing {self.__class__} object")
         self.filename = filename
         self.map = DEFAULT_KEYMAP

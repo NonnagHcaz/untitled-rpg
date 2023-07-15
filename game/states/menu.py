@@ -1,6 +1,7 @@
 from typing import Any
 import pygame
 from pygame.sprite import Group, Sprite
+from game import config
 
 from game.states.state import GameState
 
@@ -240,7 +241,7 @@ class MenuState(GameState):
     def load_game(self):
         self.next_state = "GAME"
         self.done = True
-        self.game.load_game("savegame.dat", "GAME")
+        self.game.load_game(config.SAVE_FILE, "GAME")
 
     def exit_game(self):
         self.game.done = True
@@ -276,7 +277,7 @@ class PauseState(MenuState):
     def save_game(self):
         self.next_state = "GAME"
         self.done = True
-        self.game.save_game("savegame.dat", "GAME")
+        self.game.save_game(config.SAVE_FILE, "GAME")
 
     def quit_to_menu(self):
         self.next_state = "MENU"
