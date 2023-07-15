@@ -293,6 +293,7 @@ class Gameplay(GameState):
         for projectile in player_enemy_projectile_collisions:
             self.player.blink()
             self.player.health -= projectile.damage
+            projectile.kill()
 
         for enemy in self.enemies:
             enemy_projectile_collisions = pygame.sprite.spritecollide(
@@ -301,6 +302,7 @@ class Gameplay(GameState):
             for projectile in enemy_projectile_collisions:
                 enemy.blink()
                 enemy.health -= projectile.damage
+                projectile.kill()
 
     def respawn(self):
         for sprite in self.player_sprites:
