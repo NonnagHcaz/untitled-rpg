@@ -9,9 +9,16 @@ Setup
 -----
 
 - `pip install -r requirements.txt`
-- `python script.py`
+- `python untitled_rpg.py`
 
 Tested with Python 3.10 and Pygame 2.5.0
+
+
+Build
+-----
+
+- `pip install -r requirements.txt`
+- `assets\scripts\build`
 
 
 Credit

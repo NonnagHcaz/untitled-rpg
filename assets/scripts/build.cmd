@@ -1,0 +1,1 @@
+pyinstaller --onefile untitled_rpg.py --collect-data assets/graphics --collect-data assets/fonts
