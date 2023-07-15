@@ -151,7 +151,7 @@ class Gameplay(GameState):
                 target=self.player,
                 angle=-90,
                 font_file=self.font,
-                text=self.player.diagnostics_pretty,
+                text={"func": self.player.diagnostics_pretty, "args": [self.cam]},
                 max_width=self.player.rect.width * 2,
             )
         )
@@ -184,7 +184,7 @@ class Gameplay(GameState):
                     target=sprite,
                     angle=-90,
                     font_file=self.font,
-                    text=sprite.diagnostics_pretty,
+                    text={"func": sprite.diagnostics_pretty, "args": [self.cam]},
                     max_width=sprite.rect.width * 2,
                 )
             )
