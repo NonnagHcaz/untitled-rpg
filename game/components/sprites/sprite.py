@@ -322,6 +322,7 @@ class MovableSprite(Sprite):
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
+        self.update_speed()
 
     def move(self, pos, *args, **kwargs):
         self.pos = pos
