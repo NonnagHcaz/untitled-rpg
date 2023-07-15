@@ -4,6 +4,7 @@ The splash screen of the game. The first thing the user sees.
 
 import pygame
 from game.components.sprites.text.text import Text
+from game.utils import resource_path
 
 from game.utils.asset_cache import _fn
 
@@ -20,10 +21,10 @@ class SplashState(GameState):
         self.timeout = 5
 
     def startup(self, current_time, persistant, surface):
-        self.font_file = "assets/fonts/PixeloidSans.ttf"
+        self.font_file = resource_path("assets/fonts/PixeloidSans.ttf")
         self.font = pygame.font.Font(self.font_file, 64)
         self.image = self.font.render(
-            "A Game By NonnagHcaz", True, pygame.Color("white")
+            "A Game by NonnagHcaz", True, pygame.Color("white")
         )
         # self.image = self.asset_cache[_fn(os.path.join(config.GFX_DIR, "splash1.png"))]
         self.rect = self.image.get_rect(center=surface.get_rect().center)

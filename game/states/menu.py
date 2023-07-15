@@ -4,6 +4,7 @@ from pygame.sprite import Group, Sprite
 from game import config
 
 from game.states.state import GameState
+from game.utils import resource_path
 
 
 class MenuSprite(Sprite):
@@ -135,7 +136,7 @@ class MenuState(GameState):
 
         self.elements = []
 
-        self.font_file = "assets/fonts/PixeloidSans.ttf"
+        self.font_file = resource_path("assets/fonts/PixeloidSans.ttf")
         self.heading_font_size = 32
         self.button_font_size = 24
 

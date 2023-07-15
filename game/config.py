@@ -35,6 +35,8 @@ from pygame.locals import (
     K_F1,
 )
 
+from game.utils import resource_path
+
 
 SCREEN_SIZES = {
     # "nHD": (640, 360),
@@ -60,7 +62,7 @@ IMAGE_ACCEPTS = (".png", ".jpg", ".bmp")
 FONT_ACCEPTS = ".ttf"
 SOUND_ACCEPTS = (".wav", ".mp3", ".ogg", ".mdi")
 
-ASSETS_DIR = "assets"
+ASSETS_DIR = resource_path("assets")
 GFX_DIR = os.path.join(ASSETS_DIR, "graphics")
 FONT_DIR = os.path.join(ASSETS_DIR, "fonts")
 SFX_DIR = os.path.join(ASSETS_DIR, "sound")
