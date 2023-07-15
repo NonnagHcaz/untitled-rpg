@@ -27,6 +27,10 @@ class GameState(object):
         self.asset_cache = asset_cache
         self.previous_state = None
         self.next_state = None
+        self.screen = self.game.screen.copy()
+        self.screen_rect = self.screen.get_rect()
+        self.screen_size = self.screen_rect.size
+        self.screen_width, self.screen_height = self.screen_size
 
     def get_event(self, event):
         """Processes events that were passed from the main event loop.
