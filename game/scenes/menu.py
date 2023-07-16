@@ -284,3 +284,12 @@ class PauseMenuScene(MainMenuScene):
     def quit_to_menu(self):
         self.next_scene = "MENU"
         self.done = True
+
+    def get_event(self, event):
+        super().get_event(event)
+        if (
+            self.current_time - self.start_time > 1 / 1000
+            and event.type == pygame.KEYDOWN
+            and event.key == pygame.K_ESCAPE
+        ):
+            self.resume_game()
