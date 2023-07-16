@@ -25,6 +25,7 @@ from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 
 import logging
 from game.components.sprites.text.text import TargetedText
+from game.components.sprites.ui.health_bar import UIHealthBar, UIManaBar, UIStaminaBar
 from game.level import Dungeon
 
 from game.states.state import GameState
@@ -64,6 +65,7 @@ class Gameplay(GameState):
 
         self.controls = Controls()
 
+        self.ui_sprites = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
         self.enemy_projectiles = pygame.sprite.Group()
@@ -77,20 +79,6 @@ class Gameplay(GameState):
         level_width = 16 * 250
         level_height = 9 * 250
 
-        self.cursor = Cursor(
-            name="cursor",
-            image=self.asset_cache[
-                _fn(os.path.join(config.GFX_DIR, "crosshair_1.png"))
-            ],
-            cam=self.cam,
-        )
-
-        self.cursor.text = TargetedText(
-            target=self.cursor,
-            text=self.cursor.diagnostics_pretty,
-            max_width=self.cursor.rect.width * 2,
-        )
-
         self.level = Dungeon(
             width=level_width,
             height=level_height,
@@ -103,7 +91,43 @@ class Gameplay(GameState):
         self.walls = self.level.build_test_walls()
 
         self.respawn()
-        # self.hitboxes.add(Hitbox(target=self.player))
+
+        self.cursor = Cursor(
+            name="cursor",
+            image=self.asset_cache[
+                _fn(os.path.join(config.GFX_DIR, "crosshair_1.png"))
+            ],
+            cam=self.cam,
+        )
+
+        cursor_text = TargetedText(
+            target=self.cursor,
+            text=self.cursor.diagnostics_pretty,
+            max_width=self.cursor.rect.width * 2,
+        )
+        self.cursor.text = cursor_text
+        ui_healthbar = UIHealthBar(
+            target=self.player,
+            offset=0,
+            current_attribute="health",
+            max_attribute="base_health",
+        )
+        ui_staminabar = UIStaminaBar(
+            target=self.player,
+            offset=0,
+            current_attribute="stamina",
+            max_attribute="base_stamina",
+        )
+        ui_manabar = UIManaBar(
+            target=self.player,
+            offset=0,
+            current_attribute="mana",
+            max_attribute="base_mana",
+        )
+
+        self.ui_sprites.add(
+            self.cursor, cursor_text, ui_healthbar, ui_staminabar, ui_manabar
+        )
 
         self.mp_line = pygame.sprite.Sprite()
 
@@ -150,10 +174,10 @@ class Gameplay(GameState):
         # self.all_sprites.add(self.hitboxes, layer=3)
         self.all_sprites.add(self.status_bars, layer=3)
         self.all_sprites.add(self.texts, layer=3)
-        # self.all_sprites.add(self.cursor)
         self.all_sprites.add(self.player_sprites)
-        for sprite in self.player_sprites:
-            self.all_sprites.move_to_front(sprite)
+        for group in [self.player_sprites]:
+            for sprite in group:
+                self.all_sprites.move_to_front(sprite)
 
     def cleanup(self):
         """Stop the music when scene is done."""
@@ -229,8 +253,6 @@ class Gameplay(GameState):
         end_vector = self.cursor.pos
         dx = end_vector[0] - start_vector[0]
         dy = end_vector[1] - start_vector[1]
-
-        # print(dx, dy)
         angle = math.degrees(math.atan2(-dy, dx)) % 360
 
         if start_vector[0] < end_vector[0]:
@@ -405,8 +427,9 @@ class Gameplay(GameState):
 
         fake_surface = surface.copy()
         self.check_collisions()
-        self.cursor.update()
-        self.cursor.text.update()
+        # self.cursor.update()
+        # self.cursor.text.update()
+        self.ui_sprites.update(surface)
 
         self.all_sprites.update(fake_surface)
         fake_surface.fill(pygame.Color("black"))
