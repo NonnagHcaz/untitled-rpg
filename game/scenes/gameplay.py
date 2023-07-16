@@ -24,13 +24,14 @@ from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 
 
 import logging
-from game.components.sprites.text.text import TargetedText
+from game.components.sprites.text.text import TargetedTextBox
 from game.components.sprites.ui.health_bar import UIHealthBar, UIManaBar, UIStaminaBar
 from game.level import Dungeon
 
 from game.scenes.scene import Scene
 from game.utils.asset_cache import _fn
 from game.utils.controls import Controls
+from game.utils.events import ADDENEMY
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +57,7 @@ class GameplayScene(Scene):
     def startup(self, current_time, persistent, surface):
         super().startup(current_time, persistent, surface)
         pygame.mouse.set_visible(False)
+        pygame.time.set_timer(ADDENEMY, config.DEFAULT_ENEMY_SPAWN_TIMER)
         # pygame.mixer.music.load(self.bgm)
         # pygame.mixer.music.play(-1)
         self.cam = Camera()
@@ -100,7 +102,7 @@ class GameplayScene(Scene):
             cam=self.cam,
         )
 
-        cursor_text = TargetedText(
+        cursor_text = TargetedTextBox(
             target=self.cursor,
             text=self.cursor.diagnostics_pretty,
             max_width=self.cursor.rect.width * 2,
@@ -130,37 +132,9 @@ class GameplayScene(Scene):
         )
 
         self.mp_line = pygame.sprite.Sprite()
-
-        for _ in range(self.level.width // 100):
-            x = random.randint(int(self.level.width * 0.1), int(self.level.width * 0.9))
-            y = random.randint(
-                int(self.level.height * 0.1), int(self.level.height * 0.9)
-            )
-            sprite = self.level.spawn_random_enemy(pos=(x, y))
-            sprite.debug = self.debug
-            self.enemies.add(sprite)
-            # self.hitboxes.add(Hitbox(target=sprite))
-            self.status_bars.add(
-                TargetedStatusBar(
-                    target=sprite,
-                    offset=5,
-                    width=sprite.rect.width * 2,
-                    primary_color=pygame.Color("red"),
-                    border_color=pygame.Color("white"),
-                    border_width=2,
-                    current_attribute="health",
-                    max_attribute="base_health",
-                )
-            )
-            self.texts.add(
-                TargetedText(
-                    target=sprite,
-                    angle=-90,
-                    font_file=self.font,
-                    text={"func": sprite.diagnostics_pretty, "args": [self.cam]},
-                    max_width=sprite.rect.width * 2,
-                )
-            )
+        self.max_enemies = self.level.width // 100
+        while len(self.enemies) < self.max_enemies:
+            sprite = self.spawn_random_enemy()
 
         self.all_sprites = CameraAwareLayeredUpdates(
             target=self.player,
@@ -179,9 +153,52 @@ class GameplayScene(Scene):
             for sprite in group:
                 self.all_sprites.move_to_front(sprite)
 
+    def spawn_random_enemy(self):
+        perc = 0.2
+        x = random.randint(
+            int(self.level.width * perc), int(self.level.width * (1.0 - perc))
+        )
+        y = random.randint(
+            int(self.level.height * perc), int(self.level.height * (1.0 - perc))
+        )
+        sprite = self.level.spawn_random_enemy(pos=(x, y))
+        sprite.debug = self.debug
+
+        status_bar = TargetedStatusBar(
+            target=sprite,
+            offset=5,
+            width=sprite.rect.width * 2,
+            primary_color=pygame.Color("red"),
+            border_color=pygame.Color("white"),
+            border_width=2,
+            current_attribute="health",
+            max_attribute="base_health",
+        )
+
+        debug_textbox = TargetedTextBox(
+            target=sprite,
+            angle=-90,
+            font_file=self.font,
+            text={"func": sprite.diagnostics_pretty, "args": [self.cam]},
+            max_width=sprite.rect.width * 2,
+        )
+
+        sprite.status_bars = [status_bar]
+        sprite.debug_textbox = debug_textbox
+
+        self.enemies.add(sprite)
+        # self.hitboxes.add(Hitbox(target=sprite))
+        self.status_bars.add(status_bar)
+        self.texts.add(debug_textbox)
+        if self.all_sprites:
+            self.all_sprites.add(status_bar, debug_textbox, sprite)
+        logger.debug(f"Spawned {sprite.name} at {sprite.pos}")
+        return sprite
+
     def cleanup(self):
         """Stop the music when scene is done."""
         # pygame.mixer.music.stop()
+        pygame.time.set_timer(ADDENEMY, 0)
         pygame.mouse.set_visible(True)
         return super().cleanup()
 
@@ -202,6 +219,8 @@ class GameplayScene(Scene):
                 self.respawn()
             elif event.key == pygame.K_p:
                 self.possess()
+        elif event.type == ADDENEMY:
+            self.spawn_random_enemy()
 
     def handle_controls(self):
         if not self.player:
@@ -390,7 +409,7 @@ class GameplayScene(Scene):
         mana_bar = TargetedStatusBar(**mana_config)
         stamina_bar = TargetedStatusBar(**stamina_config)
 
-        debug_text = TargetedText(
+        debug_textbox = TargetedTextBox(
             target=self.player,
             angle=-90,
             font_file=self.font,
@@ -398,10 +417,13 @@ class GameplayScene(Scene):
             max_width=self.player.rect.width * 2,
         )
 
+        self.player.debug_textbox = debug_textbox
+        self.player.status_bars = [health_bar, mana_bar, stamina_bar]
+
         self.status_bars.add(health_bar, mana_bar, stamina_bar)
-        self.texts.add(debug_text)
+        self.texts.add(debug_textbox)
         self.player_sprites.add(
-            self.player, health_bar, mana_bar, stamina_bar, debug_text
+            self.player, health_bar, mana_bar, stamina_bar, debug_textbox
         )
 
         try:

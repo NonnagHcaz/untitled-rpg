@@ -3,7 +3,7 @@ import pygame
 import math
 
 
-class Text(pygame.sprite.Sprite):
+class TextBox(pygame.sprite.Sprite):
     def __init__(
         self,
         text,
@@ -198,7 +198,7 @@ class Text(pygame.sprite.Sprite):
         self.render(**kwargs)
 
 
-class TargetedText(Text):
+class TargetedTextBox(TextBox):
     def __init__(self, target, angle=90, offset=5, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.target = target

@@ -3,7 +3,7 @@ The splash screen of the game. The first thing the user sees.
 """
 
 import pygame
-from game.components.sprites.text.text import Text
+from game.components.sprites.text.text import TextBox
 from game.utils import resource_path
 
 from game.utils.asset_cache import _fn
