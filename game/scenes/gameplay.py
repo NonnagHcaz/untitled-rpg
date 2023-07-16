@@ -104,12 +104,12 @@ class GameplayScene(Scene):
             cam=self.cam,
         )
 
-        cursor_text = TargetedTextBox(
-            target=self.cursor,
-            text=self.cursor.diagnostics_pretty,
-            max_width=self.cursor.rect.width * 2,
-        )
-        self.cursor.text = cursor_text
+        # cursor_text = TargetedTextBox(
+        #     target=self.cursor,
+        #     text=self.cursor.diagnostics_pretty,
+        #     max_width=self.cursor.rect.width * 2,
+        # )
+        # self.cursor.text = cursor_text
 
         ui_bar_offset = 10
 
@@ -153,9 +153,7 @@ class GameplayScene(Scene):
             ui_bar_offset + ui_healthbar.height + ui_bar_offset,
         )
 
-        self.ui_sprites.add(
-            self.cursor, cursor_text, ui_healthbar, ui_manabar, ui_staminabar
-        )
+        self.ui_sprites.add(self.cursor, ui_healthbar, ui_manabar, ui_staminabar)
 
         self.mp_line = pygame.sprite.Sprite()
         self.max_enemies = self.level.width // 100
