@@ -72,7 +72,13 @@ class Sprite(pygame.sprite.Sprite):
         fake_pos = None
         if cam:
             fake_pos = r.center - cam
-        msg = f"name: {n}\nreal pos: {r.center}\nfake pos: {fake_pos}\n{d}\nsize: {r.size}\ndebug: {self.debug}"
+        msg = f"""
+            name: {n}
+            pos: {r.center} ({fake_pos})
+            dir: {d}
+            size: {r.size}
+            debug: {self.debug}
+        """
         return msg
 
     @property
@@ -450,15 +456,81 @@ class CombatantSprite(LivingSprite):
     def attack(self, *others):
         results = {}
         for other in others:
-            r = getattr(self, "damage", 0) - getattr(other, "armor", 0)
-            # TODO: Implement resistances
-            results[other] = self.draw_mult if r == 0 else r > 0
-        return results
+            results[other] = other.defend(self)[self]
 
     def defend(self, *others):
         results = {}
         for other in others:
-            r = getattr(self, "armor", 0) - getattr(other, "damage", 0)
-            # TODO: Implement resistances
-            results[other] = self.draw_mult if r == 0 else r > 0
+            # TODO: Implmenet absorbing damage if the entity has a specific trait based on damage type
+            raw_damage = min(0, getattr(self, "armor", 0) - getattr(other, "damage", 0))
+            magic_damage = min(
+                0,
+                getattr(self, "magic_resistance", 0)
+                - getattr(other, "magic_damage", 0),
+            )
+            fire_damage = min(
+                0,
+                getattr(self, "fire_resistance", 0) - getattr(other, "fire_damage", 0),
+            )
+            water_damage = min(
+                0,
+                getattr(self, "water_resistance", 0)
+                - getattr(other, "water_damage", 0),
+            )
+            electricity_damage = min(
+                0,
+                getattr(self, "electricity_resistance", 0)
+                - getattr(other, "electricity_damage", 0),
+            )
+            dark_damage = min(
+                0,
+                getattr(self, "dark_resistance", 0) - getattr(other, "dark_damage", 0),
+            )
+            light_damage = min(
+                0,
+                getattr(self, "light_resistance", 0)
+                - getattr(other, "light_damage", 0),
+            )
+            ice_damage = min(
+                0,
+                getattr(self, "ice_resistance", 0) - getattr(other, "ice_damage", 0),
+            )
+            air_damage = min(
+                0,
+                getattr(self, "air_resistance", 0) - getattr(other, "air_damage", 0),
+            )
+
+            anti_synergies = {
+                ("dark", "light"): dark_damage - light_damage
+                if getattr(self, "dark_resistance", 0)
+                and getattr(other, "dark_damage", 0)
+                else light_damage,
+                ("fire", "water"): fire_damage - water_damage
+                if getattr(self, "fire_resistance", 0)
+                and getattr(other, "fire_damage", 0)
+                else water_damage,
+            }
+
+            synergies = {
+                ("electricity", "water"): water_damage * electricity_damage,
+                ("electricity", "air"): air_damage * electricity_damage,
+                ("fire", "ice"): ice_damage * fire_damage,
+                ("dark", "fire"): fire_damage * dark_damage,
+            }
+
+            # Find max damage potential from other based on own armor and resistances
+
+            damage_taken = max(
+                raw_damage,
+                magic_damage,
+                electricity_damage,
+                max(*list(anti_synergies.values())),
+                max(*list(synergies.values())),
+            )
+
+            self.health = max(
+                0,
+                self.health - damage_taken,
+            )
+            results[other] = damage_taken
         return results
