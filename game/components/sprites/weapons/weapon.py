@@ -1,4 +1,6 @@
 import math
+import random
+import pygame
 
 import logging
 
@@ -77,3 +79,45 @@ class Projectile(CombatantSprite, MovableSprite):
 class Arrow(Projectile):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+class MagicOrb(Projectile):
+    def __init__(
+        self,
+        color=None,
+        radius=4,
+        border_color=pygame.Color("black"),
+        border_width=1,
+        *args,
+        **kwargs
+    ):
+        if not color:
+            r = random.randint(0, 255)
+            g = random.randint(0, 255)
+            b = random.randint(0, 255)
+            color = (r, g, b)
+        if not border_color:
+            r = random.randint(0, 255)
+            g = random.randint(0, 255)
+            b = random.randint(0, 255)
+            border_color = (r, g, b)
+        image = self._create_orb_surface(color, radius, border_color, border_width)
+        kwargs["image"] = image
+        super().__init__(*args, **kwargs)
+
+    def _create_orb_surface(self, color, radius, border_color, border_width):
+        image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+
+        if border_width:
+            pygame.draw.circle(
+                surface=image,
+                color=border_color,
+                center=(radius, radius),
+                radius=radius,
+                width=border_width,
+            )
+        pygame.draw.circle(
+            surface=image, color=color, center=(radius, radius), radius=radius
+        )
+
+        return image
