@@ -7,6 +7,10 @@ from game import config
 from game.states.state import GameState
 from game.utils import resource_path
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class MenuSprite(Sprite):
     def __init__(self, image: pygame.Surface, *groups: Group) -> None:
@@ -236,7 +240,7 @@ class MenuState(GameState):
             button.onclick()
 
     def start_game(self):
-        print("Switching to GameplayState")
+        logger.debug("Switching to GameplayState")
         self.next_state = "GAME"
         self.done = True
 
@@ -272,7 +276,7 @@ class PauseState(MenuState):
         self.heading_text = "Paused"
 
     def resume_game(self):
-        print("Switching to GameplayState")
+        logger.debug("Switching to GameplayState")
         self.next_state = "GAME"
         self.done = True
 

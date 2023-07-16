@@ -82,17 +82,16 @@ class Game(object):
         }
         with open(filename, "wb") as file:
             pickle.dump(game_state, file)
-        print("Game saved.")
+        logger.info("Game saved.")
 
     def load_game(self, filename):
         try:
             with open(filename, "rb") as file:
                 game_state = pickle.load(file)
-            print(game_state)
             # Update other game state variables as needed
-            print("Game loaded.")
+            logger.info("Game loaded.")
         except FileNotFoundError:
-            print("No save file found.")
+            logger.warning("No save file found.")
 
         self.current_state.next_state = "GAME"
         self.flip_state()

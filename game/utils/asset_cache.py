@@ -26,7 +26,7 @@ class Mapper(object):
         if fmt is None:
             fmt = "0x72"  # TODO: Sample x lines and determine fmt
         if fmt not in self.valid_fmts:
-            print(f"bad fmt: {fmt}")
+            logger.error(f"bad fmt: {fmt}")
             return None
 
         if fmt == "0x72":
@@ -195,7 +195,7 @@ class AssetCache(object):
         if sheet_ext not in [str(x).lower() for x in image_accept] or (
             mapping and mapping_ext not in [str(x).lower() for x in mapping_accept]
         ):
-            print("ERROR", sheet, mapping)
+            logger.error(f"{sheet}, {mapping}")
             return None
 
         if mapping:
@@ -366,9 +366,6 @@ class AssetCache(object):
                 font = self.load_font(filepath, font_size=font_size)
                 self.cache[key] = font
                 return font
-
-    def _get(self, name, sheet=None):
-        print(self.map.map)
 
     def strip_from_sheet(self, sheet, start, size, columns, rows=1):
         """Strips individual frames from a sprite sheet given a start location,
