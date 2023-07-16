@@ -3,27 +3,7 @@ from enum import Enum
 
 import logging
 
-from game.config import (
-    DEFAULT_ARMOR,
-    DEFAULT_ATTACK_COOLDOWN,
-    DEFAULT_CROUCH_SPEED_MODIFIER,
-    DEFAULT_DAMAGE,
-    DEFAULT_ELECTRICITY_RESISTANCE,
-    DEFAULT_EXPERIENCE,
-    DEFAULT_FIRE_RESISTANCE,
-    DEFAULT_HEALTH,
-    DEFAULT_HEALTH_REGEN,
-    DEFAULT_MAGIC_RESISTANCE,
-    DEFAULT_MANA,
-    DEFAULT_MANA_REGEN,
-    DEFAULT_SPRINT_SPEED_MODIFIER,
-    DEFAULT_STAMINA,
-    DEFAULT_STAMINA_REGEN,
-    DEFAULT_SWIM_SPEED_MODIFIER,
-    DEFAULT_WALK_SPEED,
-    DEFAULT_WALK_SPEED_MODIFIER,
-    DEFAULT_WATER_RESISTANCE,
-)
+from game import config
 
 logger = logging.getLogger(__name__)
 
@@ -273,19 +253,19 @@ class AnimatedSprite(Sprite):
 class LivingSprite(Sprite):
     def __init__(
         self,
-        health=DEFAULT_HEALTH,
-        base_health=DEFAULT_HEALTH,
-        health_regen=DEFAULT_HEALTH_REGEN,
-        base_health_regen=DEFAULT_HEALTH_REGEN,
-        stamina=DEFAULT_STAMINA,
-        base_stamina=DEFAULT_STAMINA,
-        stamina_regen=DEFAULT_STAMINA_REGEN,
-        base_stamina_regen=DEFAULT_STAMINA_REGEN,
-        mana=DEFAULT_MANA,
-        base_mana=DEFAULT_MANA,
-        mana_regen=DEFAULT_MANA_REGEN,
-        base_mana_regen=DEFAULT_MANA_REGEN,
-        experience=DEFAULT_EXPERIENCE,
+        health=config.DEFAULT_HEALTH,
+        base_health=config.DEFAULT_HEALTH,
+        health_regen=config.DEFAULT_HEALTH_REGEN,
+        base_health_regen=config.DEFAULT_HEALTH_REGEN,
+        stamina=config.DEFAULT_STAMINA,
+        base_stamina=config.DEFAULT_STAMINA,
+        stamina_regen=config.DEFAULT_STAMINA_REGEN,
+        base_stamina_regen=config.DEFAULT_STAMINA_REGEN,
+        mana=config.DEFAULT_MANA,
+        base_mana=config.DEFAULT_MANA,
+        mana_regen=config.DEFAULT_MANA_REGEN,
+        base_mana_regen=config.DEFAULT_MANA_REGEN,
+        experience=config.DEFAULT_EXPERIENCE,
         *args,
         **kwargs,
     ):
@@ -325,11 +305,11 @@ class LivingSprite(Sprite):
 class MovableSprite(Sprite):
     def __init__(
         self,
-        walk_speed=DEFAULT_WALK_SPEED,
-        walk_speed_modifier=DEFAULT_WALK_SPEED_MODIFIER,
-        swim_speed_modifier=DEFAULT_SWIM_SPEED_MODIFIER,
-        crouch_speed_modifier=DEFAULT_CROUCH_SPEED_MODIFIER,
-        sprint_speed_modifier=DEFAULT_SPRINT_SPEED_MODIFIER,
+        walk_speed=config.DEFAULT_WALK_SPEED,
+        walk_speed_modifier=config.DEFAULT_WALK_SPEED_MODIFIER,
+        swim_speed_modifier=config.DEFAULT_SWIM_SPEED_MODIFIER,
+        crouch_speed_modifier=config.DEFAULT_CROUCH_SPEED_MODIFIER,
+        sprint_speed_modifier=config.DEFAULT_SPRINT_SPEED_MODIFIER,
         *args,
         **kwargs,
     ):
@@ -375,19 +355,19 @@ class MovableSprite(Sprite):
 class CombatantSprite(LivingSprite):
     def __init__(
         self,
-        damage=DEFAULT_DAMAGE,
-        base_damage=DEFAULT_DAMAGE,
-        armor=DEFAULT_ARMOR,
-        base_armor=DEFAULT_ARMOR,
-        magic_resistance=DEFAULT_MAGIC_RESISTANCE,
-        base_magic_resistance=DEFAULT_MAGIC_RESISTANCE,
-        fire_resistance=DEFAULT_FIRE_RESISTANCE,
-        base_fire_resistance=DEFAULT_FIRE_RESISTANCE,
-        water_resistance=DEFAULT_WATER_RESISTANCE,
-        base_water_resistance=DEFAULT_WATER_RESISTANCE,
-        electricity_resistance=DEFAULT_ELECTRICITY_RESISTANCE,
-        base_electricity_resistance=DEFAULT_ELECTRICITY_RESISTANCE,
-        attack_cooldown=DEFAULT_ATTACK_COOLDOWN,
+        damage=config.DEFAULT_DAMAGE,
+        base_damage=config.DEFAULT_DAMAGE,
+        armor=config.DEFAULT_ARMOR,
+        base_armor=config.DEFAULT_ARMOR,
+        magic_resistance=config.DEFAULT_MAGIC_RESISTANCE,
+        base_magic_resistance=config.DEFAULT_MAGIC_RESISTANCE,
+        fire_resistance=config.DEFAULT_FIRE_RESISTANCE,
+        base_fire_resistance=config.DEFAULT_FIRE_RESISTANCE,
+        water_resistance=config.DEFAULT_WATER_RESISTANCE,
+        base_water_resistance=config.DEFAULT_WATER_RESISTANCE,
+        electricity_resistance=config.DEFAULT_ELECTRICITY_RESISTANCE,
+        base_electricity_resistance=config.DEFAULT_ELECTRICITY_RESISTANCE,
+        attack_cooldown=config.DEFAULT_ATTACK_COOLDOWN,
         *args,
         **kwargs,
     ):

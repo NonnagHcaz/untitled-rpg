@@ -1,20 +1,9 @@
 import logging
 
 from game.components.sprites.entities.entity import Entity
-from game.config import (
-    DEFAULT_PLAYER_HEALTH_BAR_COLOR,
-    DEFAULT_PLAYER_HEALTH_BAR_HEIGHT,
-    DEFAULT_PLAYER_HEALTH_BAR_ORDER,
-    DEFAULT_PLAYER_MANA_BAR_COLOR,
-    DEFAULT_PLAYER_MANA_BAR_HEIGHT,
-    DEFAULT_PLAYER_MANA_BAR_ORDER,
-    DEFAULT_PLAYER_STAMINA_BAR_COLOR,
-    DEFAULT_PLAYER_STAMINA_BAR_HEIGHT,
-    DEFAULT_PLAYER_STAMINA_BAR_ORDER,
-)
 
 logger = logging.getLogger(__name__)
-
+from game import config
 import pygame
 
 
@@ -63,9 +52,9 @@ class Player(Entity):
     def draw_health_bar(self, surface, *args, **kwargs):
         self._draw_bar(
             surface,
-            DEFAULT_PLAYER_HEALTH_BAR_ORDER,
-            DEFAULT_PLAYER_HEALTH_BAR_HEIGHT,
-            DEFAULT_PLAYER_HEALTH_BAR_COLOR,
+            config.DEFAULT_PLAYER_HEALTH_BAR_ORDER,
+            config.DEFAULT_PLAYER_HEALTH_BAR_HEIGHT,
+            config.DEFAULT_PLAYER_HEALTH_BAR_COLOR,
             self.health,
             self.base_health,
         )
@@ -73,9 +62,9 @@ class Player(Entity):
     def draw_stamina_bar(self, surface, *args, **kwargs):
         self._draw_bar(
             surface,
-            DEFAULT_PLAYER_STAMINA_BAR_ORDER,
-            DEFAULT_PLAYER_STAMINA_BAR_HEIGHT,
-            DEFAULT_PLAYER_STAMINA_BAR_COLOR,
+            config.DEFAULT_PLAYER_STAMINA_BAR_ORDER,
+            config.DEFAULT_PLAYER_STAMINA_BAR_HEIGHT,
+            config.DEFAULT_PLAYER_STAMINA_BAR_COLOR,
             self.stamina,
             self.base_stamina,
         )
@@ -83,9 +72,9 @@ class Player(Entity):
     def draw_mana_bar(self, surface, *args, **kwargs):
         self._draw_bar(
             surface,
-            DEFAULT_PLAYER_MANA_BAR_ORDER,
-            DEFAULT_PLAYER_MANA_BAR_HEIGHT,
-            DEFAULT_PLAYER_MANA_BAR_COLOR,
+            config.DEFAULT_PLAYER_MANA_BAR_ORDER,
+            config.DEFAULT_PLAYER_MANA_BAR_HEIGHT,
+            config.DEFAULT_PLAYER_MANA_BAR_COLOR,
             self.mana,
             self.base_mana,
         )
