@@ -38,7 +38,7 @@ class CameraAwareLayeredUpdates(pygame.sprite.LayeredUpdates):
             self.add(target)
 
     def update(self, surface, camera=None, *args, **kwargs):
-        super().update(surface, camera or self.cam, *args, **kwargs)
+        super().update(surface=surface, camera=camera or self.cam, *args, **kwargs)
         if self.target:
             x = -self.target.rect.center[0] + surface.get_rect().width / 2
             y = -self.target.rect.center[1] + surface.get_rect().height / 2

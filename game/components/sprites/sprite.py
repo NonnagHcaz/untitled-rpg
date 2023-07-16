@@ -117,8 +117,7 @@ class Sprite(pygame.sprite.Sprite):
     def draw_hitbox(self):
         pygame.draw.rect(self.image, pygame.Color("red"), self.rect, 3)
 
-    def update(self, surface, camera=None):
-        cam = camera
+    def update(self, *args, **kwargs):
         self.draw()
 
     def draw(self):
@@ -246,7 +245,7 @@ class AnimatedSprite(Sprite):
             for x in range(bf):
                 yield None
 
-    def update(self, surface, camera=None):
+    def update(self, surface, camera=None, *args, **kwargs):
         super().update(surface, camera)
         next(self.animation)
         if self.debug:
@@ -424,7 +423,7 @@ class CombatantSprite(LivingSprite):
         else:
             return result
 
-    def update(self, surface, camera=None):
+    def update(self, surface, camera=None, *args, **kwargs):
         super().update(surface, camera)
 
         if self.force_attack_cooldown and self._check_forced_done():
