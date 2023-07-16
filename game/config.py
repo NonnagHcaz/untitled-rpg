@@ -68,6 +68,11 @@ FONT_DIR = os.path.join(ASSETS_DIR, "fonts")
 SFX_DIR = os.path.join(ASSETS_DIR, "sound")
 MUSIC_DIR = os.path.join(ASSETS_DIR, "music")
 
+DATA_DIR = resource_path("data")
+SAVE_DIR = os.path.join(DATA_DIR, "save")
+CONF_DIR = os.path.join(DATA_DIR, "conf")
+for folder in [SAVE_DIR, CONF_DIR]:
+    os.makedirs(folder, exist_ok=True)
 
 M_BUTTON1 = -5
 M_BUTTON2 = M_BUTTON1 + 1
@@ -75,12 +80,12 @@ M_BUTTON3 = M_BUTTON2 + 1
 M_BUTTON4 = M_BUTTON3 + 1
 M_BUTTON5 = M_BUTTON4 + 1
 
-CONFIGURATION_FILE = "data/conf/conf.ini"
-CONTROLS_FILE = "data/conf/controls.json"
-AUTOSAVE_FILE = "data/saves/autosave.dat"
-SAVE_FILE = "data/saves/save.dat"
-DISPLAY_FILE = "data/conf/display.json"
-SOUND_FILE = "data/conf/sound.json"
+CONFIGURATION_FILE = os.path.join(CONF_DIR, "conf.ini")
+CONTROLS_FILE = os.path.join(CONF_DIR, "controls.json")
+AUTOSAVE_FILE = os.path.join(SAVE_DIR, "autosave.dat")
+SAVE_FILE = os.path.join(SAVE_DIR, "save.dat")
+DISPLAY_FILE = os.path.join(CONF_DIR, "display.json")
+SOUND_FILE = os.path.join(CONF_DIR, "sound.json")
 
 # region Movement Keys
 

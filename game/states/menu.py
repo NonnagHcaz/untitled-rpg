@@ -1,3 +1,4 @@
+import os
 from typing import Any
 import pygame
 from pygame.sprite import Group, Sprite
@@ -136,7 +137,7 @@ class MenuState(GameState):
 
         self.elements = []
 
-        self.font_file = resource_path("assets/fonts/PixeloidSans.ttf")
+        self.font_file = os.path.join(config.FONT_DIR, "PixeloidSans.ttf")
         self.heading_font_size = 32
         self.button_font_size = 24
 

@@ -21,7 +21,7 @@ class SplashState(GameState):
         self.timeout = 5
 
     def startup(self, current_time, persistant, surface):
-        self.font_file = resource_path("assets/fonts/PixeloidSans.ttf")
+        self.font_file = os.path.join(config.FONT_DIR, "PixeloidSans.ttf")
         self.font = pygame.font.Font(self.font_file, 64)
         self.image = self.font.render(
             "A Game by NonnagHcaz", True, pygame.Color("white")

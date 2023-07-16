@@ -13,10 +13,11 @@ def get_filepaths(directory, *accepts):
 
 
 def resource_path(relative_path):
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
+    if hasattr(sys, "_MEIPASS"):
+        # Running in bundled executable mode
         base_path = sys._MEIPASS
-    except Exception:
+    else:
+        # Running in development mode
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
