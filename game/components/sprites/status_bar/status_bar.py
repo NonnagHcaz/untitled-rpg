@@ -1,4 +1,5 @@
 import pygame
+from game import config
 
 from game.components.sprites.shape.shape import Shape
 
@@ -9,7 +10,7 @@ class StatusBar(Shape):
         orientation=0,
         width=0,
         height=10,
-        primary_color=pygame.Color("red"),
+        primary_color=config.HEALTH_RED,
         secondary_color=pygame.Color("black"),
         tertiary_color=pygame.Color("black"),
         border_color=pygame.Color("white"),
@@ -110,7 +111,7 @@ class HealthBar(TargetedStatusBar):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.border_color = pygame.Color("white")
-        self.primary_color = pygame.Color("red")
+        self.primary_color = config.HEALTH_RED
         self.secondary_color = pygame.Color("black")
         self.border_width = 2
 
@@ -119,7 +120,7 @@ class StaminaBar(TargetedStatusBar):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.border_color = pygame.Color("white")
-        self.primary_color = pygame.Color("green")
+        self.primary_color = config.STAMINA_GREEN
         self.secondary_color = pygame.Color("black")
         self.border_width = 2
 
@@ -128,6 +129,6 @@ class ManaBar(TargetedStatusBar):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.border_color = pygame.Color("white")
-        self.primary_color = pygame.Color("blue")
+        self.primary_color = config.MANA_BLUE
         self.secondary_color = pygame.Color("black")
         self.border_width = 2

@@ -112,7 +112,7 @@ class StartupScene(LoadingScene):
         loading_bar_rect = pygame.Rect(
             loading_bar_x, loading_bar_y, bar_width, loading_bar_height
         )
-        pygame.draw.rect(surface, pygame.Color("green"), loading_bar_rect)
+        pygame.draw.rect(surface, config.STAMINA_GREEN, loading_bar_rect)
 
         # Draw loading text
 

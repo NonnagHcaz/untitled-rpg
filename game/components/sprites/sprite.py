@@ -146,7 +146,7 @@ class Sprite(pygame.sprite.Sprite):
         return self.image
 
     def draw_hitbox(self):
-        pygame.draw.rect(self.image, pygame.Color("red"), self.rect, 3)
+        pygame.draw.rect(self.image, config.HEALTH_RED, self.rect, 3)
 
     def update(self, *args, **kwargs):
         self.draw()
@@ -584,7 +584,7 @@ class CombatantSprite(LivingSprite):
                 self.health - damage_taken,
             )
             if damage_taken > 0:
-                blink_color = pygame.Color("red")
+                blink_color = config.HEALTH_RED
             else:
                 blink_color = pygame.Color("white")
             self.blink(color=blink_color)
