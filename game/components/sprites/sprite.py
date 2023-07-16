@@ -122,20 +122,20 @@ class Sprite(pygame.sprite.Sprite):
         self.draw()
 
     def draw(self):
-        # if self.blink_timer or self.blink_persist:
-        #     if not hasattr(self, "original_image"):
-        #         self.original_image = self.image
-        #     if self.blink_timer % BLINK_MOD:
-        #         self.image = self.original_image
-        #     else:
-        #         self.image = pygame.Surface(self.rect.size)
-        #         self.image.fill(self.blink_color)
-        #     self.blink_timer = max(0, self.blink_timer - 1)
-        #     if not self.blink_timer:
-        #         if self.blink_persist:
-        #             self.blink_timer = BLINK_MOD
-        #         else:
-        #             delattr(self, "original_image")
+        if self.blink_timer or self.blink_persist:
+            if not hasattr(self, "original_image"):
+                self.original_image = self.image
+            if self.blink_timer % BLINK_MOD:
+                self.image = self.original_image
+            else:
+                self.image = pygame.Surface(self.rect.size)
+                self.image.fill(self.blink_color)
+            self.blink_timer = max(0, self.blink_timer - 1)
+            if not self.blink_timer:
+                if self.blink_persist:
+                    self.blink_timer = BLINK_MOD
+                else:
+                    delattr(self, "original_image")
 
         if self.debug:
             self.draw_hitbox()
@@ -515,5 +515,10 @@ class CombatantSprite(LivingSprite):
                 0,
                 self.health - damage_taken,
             )
+            if damage_taken > 0:
+                blink_color = pygame.Color("red")
+            else:
+                blink_color = pygame.Color("white")
+            self.blink(color=blink_color)
             results[other] = damage_taken
         return results
