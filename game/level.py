@@ -5,7 +5,7 @@ import pygame
 from game import config
 from game.components.sprites.entities.enemies.enemy import Enemy
 from game.components.sprites.entities.entity import Entity
-from game.components.sprites.entities.player.player import Player
+from game.components.sprites.entities.player import Player
 from game.components.sprites.sprite import MovableSprite, Sprite, MergedSprite
 from game.components.sprites.weapons.weapon import Arrow, Projectile
 

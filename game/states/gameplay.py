@@ -18,7 +18,7 @@ from pygame.locals import (
 
 from game.components.camera.camera import Camera, CameraAwareLayeredUpdates
 from game.components.sprites.cursor.cursor import Cursor
-from game.components.sprites.defaults import DEFAULT_ATTACK_COOLDOWN
+
 from game.components.sprites.shape.shape import Hitbox
 from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 
@@ -58,7 +58,6 @@ class Gameplay(GameState):
         # pygame.mixer.music.load(self.bgm)
         # pygame.mixer.music.play(-1)
         self.cam = Camera()
-        self.attack_cooldown_timer = 0
 
         self.bgm = None
         self.font = None
@@ -185,9 +184,16 @@ class Gameplay(GameState):
         pressed_keys = pygame.key.get_pressed()
         pressed_btns = pygame.mouse.get_pressed(num_buttons=5)
 
-        if controls.pressed_sprint_hold(pressed_keys, pressed_btns):
+        if (
+            controls.pressed_sprint_hold(pressed_keys, pressed_btns)
+            and getattr(self.player, "stamina", 0) > 0
+        ):
             self.player.is_crouching = 0
             self.player.is_sprinting = 1
+            self.player.stamina = max(
+                0,
+                self.player.stamina - config.DEFAULT_SPRINT_STAMINA_DRAIN,
+            )
         elif controls.pressed_crouch_hold(pressed_keys, pressed_btns):
             self.player.is_crouching = 1
             self.player.is_sprinting = 0
@@ -236,15 +242,28 @@ class Gameplay(GameState):
             # cursor_collides = self.cursor.collide(self.enemies)
             # for sprite in cursor_collides:
             #     sprite.blink()
-            if len(self.projectiles) < 20 and not self.attack_cooldown_timer:
+            if (
+                not self.player.attack_cooldown_timer
+                and getattr(self.player, "mana", config.DEFAULT_PLAYER_MANA) > 0.0
+            ):
                 sprite = self.level.spawn_orb("orb", self.player, angle)
                 self.player_projectiles.add(sprite)
                 self.projectiles.add(sprite)
                 self.all_sprites.add(sprite)
                 self.all_sprites.move_to_front(sprite)
-                self.attack_cooldown_timer += getattr(
-                    self.player, "attack_cooldown", DEFAULT_ATTACK_COOLDOWN
+                self.player.attack_cooldown_timer += getattr(
+                    self.player, "attack_cooldown", config.DEFAULT_ATTACK_COOLDOWN
                 )
+                self.player.mana = max(
+                    0,
+                    self.player.mana - config.DEFAULT_MANA_DRAIN,
+                )
+                if self.player.mana <= 0.0:
+                    self.player.attack_cooldown_timer = 1
+                    self.player.force_attack_cooldown_until(
+                        "mana", "-", "base_mana", "==", 0
+                    )
+
         elif pressed_btns[1]:  # middle mouse button
             pass
         elif pressed_btns[2]:  # right click
@@ -276,8 +295,6 @@ class Gameplay(GameState):
             if not self.player.is_idle:
                 self.player.counter = 0
                 self.player.is_idle = True
-
-        self.attack_cooldown_timer = max(0, self.attack_cooldown_timer - 1)
 
     def check_collisions(self):
         player_enemies = pygame.sprite.spritecollide(

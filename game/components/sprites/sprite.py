@@ -1,8 +1,29 @@
 import pygame
-from .defaults import *
 from enum import Enum
 
 import logging
+
+from game.config import (
+    DEFAULT_ARMOR,
+    DEFAULT_ATTACK_COOLDOWN,
+    DEFAULT_CROUCH_SPEED_MODIFIER,
+    DEFAULT_DAMAGE,
+    DEFAULT_ELECTRICITY_RESISTANCE,
+    DEFAULT_EXPERIENCE,
+    DEFAULT_FIRE_RESISTANCE,
+    DEFAULT_HEALTH,
+    DEFAULT_HEALTH_REGEN,
+    DEFAULT_MAGIC_RESISTANCE,
+    DEFAULT_MANA,
+    DEFAULT_MANA_REGEN,
+    DEFAULT_SPRINT_SPEED_MODIFIER,
+    DEFAULT_STAMINA,
+    DEFAULT_STAMINA_REGEN,
+    DEFAULT_SWIM_SPEED_MODIFIER,
+    DEFAULT_WALK_SPEED,
+    DEFAULT_WALK_SPEED_MODIFIER,
+    DEFAULT_WATER_RESISTANCE,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -288,6 +309,12 @@ class LivingSprite(Sprite):
     def level(self):
         return self.experience // 10 + 1
 
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        self.health = min(self.base_health, self.health + self.health_regen)
+        self.mana = min(self.base_mana, self.mana + self.mana_regen)
+        self.stamina = min(self.base_stamina, self.stamina + self.stamina_regen)
+
 
 class MovableSprite(Sprite):
     def __init__(
@@ -354,6 +381,7 @@ class CombatantSprite(LivingSprite):
         base_water_resistance=DEFAULT_WATER_RESISTANCE,
         electricity_resistance=DEFAULT_ELECTRICITY_RESISTANCE,
         base_electricity_resistance=DEFAULT_ELECTRICITY_RESISTANCE,
+        attack_cooldown=DEFAULT_ATTACK_COOLDOWN,
         *args,
         **kwargs,
     ):
@@ -370,8 +398,54 @@ class CombatantSprite(LivingSprite):
         self.base_water_resistance = base_water_resistance
         self.electricity_resistance = electricity_resistance
         self.base_electricity_resistance = base_electricity_resistance
+        self.attack_cooldown = attack_cooldown
 
         self.draw_mult = 0
+        self.attack_cooldown_timer = 0.0
+        self.force_attack_cooldown = False
+        self.force_until_config = {}
+
+    def force_attack_cooldown_until(self, field1, operator1, field2, operator2, equals):
+        self.force_until_config = {
+            "f1": field1,
+            "op1": operator1,
+            "f2": field2,
+            "op2": operator2,
+            "eq": equals,
+        }
+
+    def toggle_force_attack_cooldown(self):
+        self.force_attack_cooldown = not self.force_attack_cooldown
+
+    def _check_forced_done(self):
+        if not self.force_until_config:
+            return True
+        f1 = self.force_until_config.get("f1")
+        f2 = self.force_until_config.get("f2")
+        op1 = self.force_until_config.get("op1")
+        op2 = self.force_until_config.get("op2")
+        eq = self.force_until_config.get("eq")
+        f1v = getattr(self, f1, None)
+        f2v = getattr(self, f2, None)
+
+        try:
+            result = eval(f"{f1v} {op1} {f2v} {op2} {eq}")
+        except Exception as ex:
+            raise ex
+        else:
+            return result
+
+    def update(self, surface, camera=None):
+        super().update(surface, camera)
+
+        if self.force_attack_cooldown and self._check_forced_done():
+            self.toggle_force_attack_cooldown()
+            self.attack_cooldown_timer = 0
+
+        self.attack_cooldown_timer = max(
+            0.0 if not self.force_attack_cooldown else 1.0,
+            self.attack_cooldown_timer - self.attack_cooldown,
+        )
 
     def attack(self, *others):
         results = {}

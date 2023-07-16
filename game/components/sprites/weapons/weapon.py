@@ -1,9 +1,8 @@
 import math
-import pygame
-from .defaults import *
-from ..sprite import CombatantSprite, Sprite, MovableSprite
 
 import logging
+
+from game.components.sprites.sprite import CombatantSprite, MovableSprite, Sprite
 
 logger = logging.getLogger(__name__)
 

@@ -1,16 +1,21 @@
-from .defaults import *
-from ..entity import Entity
-
 import logging
+
+from game.components.sprites.entities.entity import Entity
+from game.config import (
+    DEFAULT_PLAYER_HEALTH_BAR_COLOR,
+    DEFAULT_PLAYER_HEALTH_BAR_HEIGHT,
+    DEFAULT_PLAYER_HEALTH_BAR_ORDER,
+    DEFAULT_PLAYER_MANA_BAR_COLOR,
+    DEFAULT_PLAYER_MANA_BAR_HEIGHT,
+    DEFAULT_PLAYER_MANA_BAR_ORDER,
+    DEFAULT_PLAYER_STAMINA_BAR_COLOR,
+    DEFAULT_PLAYER_STAMINA_BAR_HEIGHT,
+    DEFAULT_PLAYER_STAMINA_BAR_ORDER,
+)
 
 logger = logging.getLogger(__name__)
 
 import pygame
-
-
-# class StatusBar(object):
-
-#     def __init__(self, current_value, base_value, )
 
 
 class Player(Entity):
@@ -25,6 +30,27 @@ class Player(Entity):
 
     def interact_with_coords(self, x, y):
         pass
+
+    def diagnostics_pretty(self, cam=None):
+        n = self.name
+        c = self.__class__
+        r = self.rect
+        d = self.direction
+        h = f"{self.health}/{self.base_health}"
+        s = f"{self.stamina}/{self.base_stamina}"
+        m = f"{self.mana}/{self.base_mana}"
+        fake_pos = None
+        if cam:
+            fake_pos = r.center - cam
+        msg = f"""
+            name: {n}
+            pos: {r.center} ({fake_pos})
+            dir: {d}
+            size: {r.size}
+            h: {h}, s: {s}, m: {m}
+            debug: {self.debug}
+        """
+        return msg
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
@@ -79,8 +105,8 @@ class Player(Entity):
             surface,
             _rect.topleft,
             _rect.size,
-            BLACK,
-            WHITE,
+            pygame.Color("black"),
+            pygame.Color("white"),
             color,
             value / max_value,
         )
