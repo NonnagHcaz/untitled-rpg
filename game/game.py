@@ -1,4 +1,10 @@
-"""https://gist.github.com/iminurnamez/8d51f5b40032f106a847"""
+"""Main Game controller
+
+Built from:
+https://github.com/Mekire/pygame-mutiscene-template-with-movie
+https://gist.github.com/iminurnamez/8d51f5b40032f106a847
+
+"""
 import pygame
 from pygame.locals import K_RALT, K_RETURN, VIDEOEXPOSE, VIDEORESIZE, RESIZABLE
 import pickle
