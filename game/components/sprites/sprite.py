@@ -52,13 +52,16 @@ class Sprite(pygame.sprite.Sprite):
         fake_pos = None
         if cam:
             fake_pos = r.center - cam
-        msg = f"""
-            name: {n}
-            pos: {r.center} ({fake_pos})
-            dir: {d}
-            size: {r.size}
-            debug: {self.debug}
-        """
+        msg = "\n".join(
+            [
+                f"name: {n}",
+                f"pos: {r.center} ({fake_pos})",
+                f"dir: {d}",
+                f"size: {r.size}",
+                f"debug: {self.debug}",
+            ]
+        )
+
         return msg
 
     @property

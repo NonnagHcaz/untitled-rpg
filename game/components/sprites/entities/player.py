@@ -39,6 +39,17 @@ class Player(Entity):
             h: {h}, s: {s}, m: {m}
             debug: {self.debug}
         """
+        msg = "\n".join(
+            [
+                f"name: {n}",
+                f"pos: {r.center} ({fake_pos})",
+                f"dir: {d}",
+                f"size: {r.size}",
+                f"h: {h}, s: {s}, m: {m}",
+                f"debug: {self.debug}",
+            ]
+        )
+
         return msg
 
     def update(self, *args, **kwargs):
