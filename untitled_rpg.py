@@ -2,13 +2,13 @@ import sys
 import os
 import logging
 from game import config
-from game.states.menu import MenuState, PauseState
+from game.scenes.menu import MainMenu, PauseMenu
 
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(filename="logs/debug.log", filemode="w", level=logging.DEBUG)
 
 from game.game import Game
-from game.states import Gameplay, SplashState, StartupState
+from game.scenes import Gameplay, SplashState, StartupScene
 
 if __name__ == "__main__":
     game = Game()
@@ -16,9 +16,9 @@ if __name__ == "__main__":
     states = {
         "SPLASH": SplashState(**config),
         "GAME": Gameplay(**config),
-        "STARTUP": StartupState(**config),
-        "MENU": MenuState(**config),
-        "PAUSE": PauseState(**config),
+        "STARTUP": StartupScene(**config),
+        "MENU": MainMenu(**config),
+        "PAUSE": PauseMenu(**config),
     }
     states["STARTUP"].next_state = "SPLASH"
     states["SPLASH"].next_state = "MENU"

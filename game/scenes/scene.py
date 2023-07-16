@@ -3,7 +3,7 @@
 import pygame
 
 
-class GameState(object):
+class Scene(object):
     """This is a prototype class for States.  All states should inherit from it.
     No direct instances of this class should be created. get_event and update
     must be overloaded in the childclass.  startup and cleanup need to be

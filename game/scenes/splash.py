@@ -8,12 +8,12 @@ from game.utils import resource_path
 
 from game.utils.asset_cache import _fn
 
-from .state import GameState
+from .scene import Scene
 from .. import config
 import os
 
 
-class SplashState(GameState):
+class SplashState(Scene):
     """This State is updated while our game shows the splash screen."""
 
     def __init__(self, game, asset_cache, timeout=3, text="A Game by NonnagHcaz"):

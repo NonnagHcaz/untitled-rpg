@@ -28,7 +28,7 @@ from game.components.sprites.text.text import TargetedText
 from game.components.sprites.ui.health_bar import UIHealthBar, UIManaBar, UIStaminaBar
 from game.level import Dungeon
 
-from game.states.state import GameState
+from game.scenes.scene import Scene
 from game.utils.asset_cache import _fn
 from game.utils.controls import Controls
 
@@ -39,7 +39,7 @@ from .. import config
 # pygame.mouse.set_visible(False)
 
 
-class Gameplay(GameState):
+class Gameplay(Scene):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.level = None

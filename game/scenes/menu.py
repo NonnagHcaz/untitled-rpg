@@ -4,7 +4,7 @@ import pygame
 from pygame.sprite import Group, Sprite
 from game import config
 
-from game.states.state import GameState
+from game.scenes.scene import Scene
 from game.utils import resource_path
 
 import logging
@@ -126,7 +126,7 @@ class MenuButton(MenuText):
         return button_image
 
 
-class MenuState(GameState):
+class MainMenu(Scene):
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
 
@@ -261,7 +261,7 @@ class MenuState(GameState):
             surface.blit(sprite.image, sprite.rect)
 
 
-class PauseState(MenuState):
+class PauseMenu(MainMenu):
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
         self.options = [
