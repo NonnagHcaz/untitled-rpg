@@ -54,6 +54,7 @@ class GameplayScene(Scene):
         self.all_sprites = None
         self.debug = True
         self.zoom = 1
+        self.font_file = resource_path("assets/fonts/PixeloidSans.ttf")
 
     def startup(self, current_time, persistent, surface):
         super().startup(current_time, persistent, surface)
@@ -109,27 +110,51 @@ class GameplayScene(Scene):
             max_width=self.cursor.rect.width * 2,
         )
         self.cursor.text = cursor_text
+
+        ui_bar_offset = 10
+
         ui_healthbar = UIHealthBar(
+            width=min(self.screen_width * 0.3, 500),
+            height=30,
             target=self.player,
             offset=0,
             current_attribute="health",
             max_attribute="base_health",
         )
-        ui_staminabar = UIStaminaBar(
-            target=self.player,
-            offset=0,
-            current_attribute="stamina",
-            max_attribute="base_stamina",
-        )
+        ui_healthbar.rect.topleft = (ui_bar_offset, ui_bar_offset)
+
         ui_manabar = UIManaBar(
+            width=min(
+                self.screen_width * 0.2 - ui_bar_offset / 2, 300 - ui_bar_offset / 2
+            ),
+            height=30,
             target=self.player,
             offset=0,
             current_attribute="mana",
             max_attribute="base_mana",
         )
+        ui_manabar.rect.topleft = (
+            ui_bar_offset,
+            ui_bar_offset + ui_healthbar.height + ui_bar_offset,
+        )
+
+        ui_staminabar = UIStaminaBar(
+            width=min(
+                self.screen_width * 0.1 - ui_bar_offset / 2, 200 - ui_bar_offset / 2
+            ),
+            height=30,
+            target=self.player,
+            offset=0,
+            current_attribute="stamina",
+            max_attribute="base_stamina",
+        )
+        ui_staminabar.rect.topleft = (
+            ui_bar_offset + ui_manabar.width + ui_bar_offset,
+            ui_bar_offset + ui_healthbar.height + ui_bar_offset,
+        )
 
         self.ui_sprites.add(
-            self.cursor, cursor_text, ui_healthbar, ui_staminabar, ui_manabar
+            self.cursor, cursor_text, ui_healthbar, ui_manabar, ui_staminabar
         )
 
         self.mp_line = pygame.sprite.Sprite()
@@ -166,10 +191,11 @@ class GameplayScene(Scene):
         sprite.debug = self.debug
 
         status_bar = TargetedStatusBar(
+            font_file=self.font_file,
             target=sprite,
             offset=5,
             width=sprite.rect.width * 2,
-            primary_color=pygame.Color("red"),
+            primary_color=config.HEALTH_RED,
             border_color=pygame.Color("white"),
             border_width=2,
             current_attribute="health",
@@ -221,7 +247,8 @@ class GameplayScene(Scene):
             elif event.key == pygame.K_p:
                 self.possess()
         elif event.type == ADDENEMY:
-            self.spawn_random_enemy()
+            if len(self.enemies) < self.max_enemies:
+                self.spawn_random_enemy()
 
     def handle_controls(self):
         if not self.player:
@@ -373,42 +400,42 @@ class GameplayScene(Scene):
         self.player = self.level.spawn_player()
         self.player.debug = self.debug
 
-        height = 10
-        offset = 5
-        offsets = [offset * (i + 1) + height * i for i in range(3)]
+        # height = 10
+        # offset = 5
+        # offsets = [offset * (i + 1) + height * i for i in range(3)]
 
-        config = {
-            "target": self.player,
-            "width": self.player.rect.width * 2,
-            "secondary_color": pygame.Color("black"),
-            "border_color": pygame.Color("white"),
-            "border_width": 2,
-        }
+        # config = {
+        #     "target": self.player,
+        #     "width": self.player.rect.width * 2,
+        #     "secondary_color": pygame.Color("black"),
+        #     "border_color": pygame.Color("white"),
+        #     "border_width": 2,
+        # }
 
-        health_config = {
-            "offset": offsets[0],
-            "primary_color": pygame.Color("red"),
-            "current_attribute": "health",
-            "max_attribute": "base_health",
-        }
-        health_config.update(config)
-        mana_config = {
-            "offset": offsets[1],
-            "primary_color": pygame.Color("blue"),
-            "current_attribute": "mana",
-            "max_attribute": "base_mana",
-        }
-        mana_config.update(config)
-        stamina_config = {
-            "offset": offsets[2],
-            "primary_color": pygame.Color("green"),
-            "current_attribute": "stamina",
-            "max_attribute": "base_stamina",
-        }
-        stamina_config.update(config)
-        health_bar = TargetedStatusBar(**health_config)
-        mana_bar = TargetedStatusBar(**mana_config)
-        stamina_bar = TargetedStatusBar(**stamina_config)
+        # health_config = {
+        #     "offset": offsets[0],
+        #     "primary_color": config.HEALTH_RED,
+        #     "current_attribute": "health",
+        #     "max_attribute": "base_health",
+        # }
+        # health_config.update(config)
+        # mana_config = {
+        #     "offset": offsets[1],
+        #     "primary_color": config.MANA_BLUE,
+        #     "current_attribute": "mana",
+        #     "max_attribute": "base_mana",
+        # }
+        # mana_config.update(config)
+        # stamina_config = {
+        #     "offset": offsets[2],
+        #     "primary_color": config.STAMINA_GREEN,
+        #     "current_attribute": "stamina",
+        #     "max_attribute": "base_stamina",
+        # }
+        # stamina_config.update(config)
+        # health_bar = TargetedStatusBar(font_file=self.font_file, **health_config)
+        # mana_bar = TargetedStatusBar(font_file=self.font_file, **mana_config)
+        # stamina_bar = TargetedStatusBar(font_file=self.font_file, **stamina_config)
 
         debug_textbox = TargetedTextBox(
             target=self.player,
@@ -419,12 +446,12 @@ class GameplayScene(Scene):
         )
 
         self.player.debug_textbox = debug_textbox
-        self.player.status_bars = [health_bar, mana_bar, stamina_bar]
+        # self.player.status_bars = [health_bar, mana_bar, stamina_bar]
 
-        self.status_bars.add(health_bar, mana_bar, stamina_bar)
+        # self.status_bars.add(health_bar, mana_bar, stamina_bar)
         self.texts.add(debug_textbox)
         self.player_sprites.add(
-            self.player, health_bar, mana_bar, stamina_bar, debug_textbox
+            self.player, debug_textbox  # , health_bar, mana_bar, stamina_bar
         )
 
         try:
@@ -461,8 +488,10 @@ class GameplayScene(Scene):
         fake_surface.fill(pygame.Color("black"))
         self.all_sprites.draw(fake_surface)
 
-        fake_surface.blit(self.cursor.image, self.cursor.rect)
-        fake_surface.blit(self.cursor.text.image, self.cursor.text.rect)
+        # fake_surface.blit(self.cursor.image, self.cursor.rect)
+        # fake_surface.blit(self.cursor.text.image, self.cursor.text.rect)
+        for sprite in self.ui_sprites:
+            fake_surface.blit(sprite.image, sprite.rect)
         self.draw_mp_line(fake_surface)
 
         surface.blit(fake_surface, (0, 0))
@@ -485,7 +514,7 @@ class GameplayScene(Scene):
     def draw_mp_line(self, surface):
         pygame.draw.line(
             surface,
-            pygame.Color("red"),
+            config.HEALTH_RED,
             pygame.Vector2(self.player.pos) + self.cam,
             self.cursor.pos,
         )
