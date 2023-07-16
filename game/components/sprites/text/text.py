@@ -3,19 +3,6 @@ import pygame
 import math
 
 
-class FontManager(object):
-    def __init__(self):
-        self.cache = {"default": None}
-        _attrs = dir(self)
-        self._attrs = _attrs
-
-    def add_font(self, filename, weight=None, is_italic=False, is_bold=False):
-        if weight in self._attrs:
-            return False
-        self.cache[weight] = filename
-        setattr(self, weight, filename)
-
-
 class Text(pygame.sprite.Sprite):
     def __init__(
         self,
@@ -30,8 +17,11 @@ class Text(pygame.sprite.Sprite):
         weight=None,
         max_width=0,
         max_height=0,
+        border_width=1,
+        border_color=pygame.Color("white"),
+        padding=1,
+        margin=1,
     ):
-        # Call the target class (Sprite) constructor
         super().__init__()
 
         self.text = text
@@ -46,6 +36,10 @@ class Text(pygame.sprite.Sprite):
         self.weight = weight
         self.max_height = max_height
         self.max_width = max_width
+        self.border_width = border_width
+        self.border_color = border_color
+        self.padding = padding
+        self.margin = margin
 
         self._init_fonts()
 
@@ -54,8 +48,6 @@ class Text(pygame.sprite.Sprite):
 
     def _init_fonts(self):
         self.font = pygame.font.Font(self.font_file, self.size)
-        # self.bold_font = pygame.font.Font(self.bold_font_file, self.size)
-        # self.italic_font = pygame.font.Font(self.italic_font_file, self.size)
 
     def _render(self, lines, font, color):
         if not isinstance(lines, list):
@@ -68,7 +60,7 @@ class Text(pygame.sprite.Sprite):
             renders.append({"size": size, "image": image, "index": index})
             index += 1
         surface_width = max([x["size"][0] for x in renders])
-        surface_height = sum([x["size"][1] for x in renders])
+        surface_height = sum([x["size"][1] for x in renders]) + renders[-1]["size"][1]
         surface = pygame.Surface((surface_width, surface_height))
         left, top = (0, 0)
         for render in renders:
@@ -109,14 +101,17 @@ class Text(pygame.sprite.Sprite):
         italic=None,
         underline=None,
         strikethrough=None,
+        border_width=None,
+        border_color=None,
+        padding=None,
+        margin=None,
         *args,
         **kwargs,
     ):
-        # Check if the font size attribute has changed since the last time the Font objects were initialized. If so, we need to re-initialize the Font objects
         if text is not None:
             self.text = text
         if size is not None:
-            self.size = size  # TODO: Validation
+            self.size = size
         if bold is not None:
             self.bold = bold
         if italic is not None:
@@ -125,6 +120,14 @@ class Text(pygame.sprite.Sprite):
             self.underline = underline
         if strikethrough is not None:
             self.strikethrough = strikethrough
+        if border_width is not None:
+            self.border_width = border_width
+        if border_color is not None:
+            self.border_color = border_color
+        if padding is not None:
+            self.padding = padding
+        if margin is not None:
+            self.margin = margin
 
         if isinstance(self.text, str):
             text = self.text
@@ -154,7 +157,42 @@ class Text(pygame.sprite.Sprite):
         font.italic = self.italic
         font.underline = self.underline
         font.strikethrough = self.strikethrough
-        self.image = self._render(text.split("\n"), font, self.color)
+        surface = self._render(text.split("\n"), font, self.color)
+
+        total_width = (
+            surface.get_width()
+            + 2 * self.border_width
+            + 2 * self.padding
+            + 2 * self.margin
+        )
+        total_height = (
+            surface.get_height()
+            + 2 * self.border_width
+            + 2 * self.padding
+            + 2 * self.margin
+        )
+
+        main_surface = pygame.Surface((total_width, total_height))
+        text_rect = pygame.Rect(
+            self.border_width + self.padding + self.margin,
+            self.border_width + self.padding + self.margin,
+            surface.get_width(),
+            surface.get_height(),
+        )
+        main_surface.blit(surface, text_rect)
+
+        if self.border_width > 0:
+            border_rect = pygame.Rect(
+                self.border_width // 2,
+                self.border_width // 2,
+                total_width - self.border_width,
+                total_height - self.border_width,
+            )
+            pygame.draw.rect(
+                main_surface, self.border_color, border_rect, self.border_width
+            )
+
+        self.image = main_surface
 
     def update(self, *args, **kwargs):
         self.render(**kwargs)
