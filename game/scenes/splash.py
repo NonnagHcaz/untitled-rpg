@@ -13,7 +13,7 @@ from .. import config
 import os
 
 
-class SplashState(Scene):
+class SplashScene(Scene):
     """This State is updated while our game shows the splash screen."""
 
     def __init__(self, game, asset_cache, timeout=3, text="A Game by NonnagHcaz"):

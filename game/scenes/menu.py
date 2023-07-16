@@ -126,7 +126,7 @@ class MenuButton(MenuText):
         return button_image
 
 
-class MainMenu(Scene):
+class MainMenuScene(Scene):
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
 
@@ -261,7 +261,7 @@ class MainMenu(Scene):
             surface.blit(sprite.image, sprite.rect)
 
 
-class PauseMenu(MainMenu):
+class PauseMenuScene(MainMenuScene):
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
         self.options = [

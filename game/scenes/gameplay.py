@@ -39,7 +39,7 @@ from .. import config
 # pygame.mouse.set_visible(False)
 
 
-class Gameplay(Scene):
+class GameplayScene(Scene):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.level = None
