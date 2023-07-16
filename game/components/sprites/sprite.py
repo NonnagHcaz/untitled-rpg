@@ -22,8 +22,8 @@ class Sprite(pygame.sprite.Sprite):
         SOUTH = 2
         WEST = 3
 
-    def __init__(self, name=None, image=None, debug=False):
-        super().__init__()
+    def __init__(self, name=None, image=None, debug=False, *groups, **kwargs):
+        super().__init__(*groups)
 
         self.image = image
         self._image = image
@@ -379,13 +379,25 @@ class CombatantSprite(LivingSprite):
         base_water_resistance=config.DEFAULT_WATER_RESISTANCE,
         electricity_resistance=config.DEFAULT_ELECTRICITY_RESISTANCE,
         base_electricity_resistance=config.DEFAULT_ELECTRICITY_RESISTANCE,
+        ice_resistance=config.DEFAULT_ICE_RESISTANCE,
+        base_ice_resistance=config.DEFAULT_ICE_RESISTANCE,
+        poison_resistance=config.DEFAULT_POISON_RESISTANCE,
+        base_poison_resistance=config.DEFAULT_POISON_RESISTANCE,
+        dark_resistance=config.DEFAULT_DARK_RESISTANCE,
+        base_dark_resistance=config.DEFAULT_DARK_RESISTANCE,
+        light_resistance=config.DEFAULT_LIGHT_RESISTANCE,
+        base_light_resistance=config.DEFAULT_LIGHT_RESISTANCE,
+        bleed_resistance=config.DEFAULT_BLEED_RESISTANCE,
+        base_bleed_resistance=config.DEFAULT_BLEED_RESISTANCE,
         attack_cooldown=config.DEFAULT_ATTACK_COOLDOWN,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
+
         self.damage = damage
         self.base_damage = base_damage
+
         self.armor = armor
         self.base_armor = base_armor
         self.magic_resistance = magic_resistance
@@ -396,6 +408,17 @@ class CombatantSprite(LivingSprite):
         self.base_water_resistance = base_water_resistance
         self.electricity_resistance = electricity_resistance
         self.base_electricity_resistance = base_electricity_resistance
+        self.poison_resistance = poison_resistance
+        self.base_poison_resistance = base_poison_resistance
+        self.ice_resistance = ice_resistance
+        self.base_ice_resistance = base_ice_resistance
+        self.dark_resistance = dark_resistance
+        self.base_dark_resistance = base_dark_resistance
+        self.light_resistance = light_resistance
+        self.base_light_resistance = base_light_resistance
+        self.bleed_resistance = bleed_resistance
+        self.base_bleed_resistance = base_bleed_resistance
+
         self.attack_cooldown = attack_cooldown
 
         self.draw_mult = 0
