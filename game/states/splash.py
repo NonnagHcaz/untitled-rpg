@@ -16,16 +16,16 @@ import os
 class SplashState(GameState):
     """This State is updated while our game shows the splash screen."""
 
-    def __init__(self, game, asset_cache):
+    def __init__(self, game, asset_cache, timeout=3, text="A Game by NonnagHcaz"):
         super().__init__(game, asset_cache)
-        self.timeout = 5
+        self.timeout = timeout
+        self.text = text
 
     def startup(self, current_time, persistant, surface):
         self.font_file = os.path.join(config.FONT_DIR, "PixeloidSans.ttf")
         self.font = pygame.font.Font(self.font_file, 64)
-        self.image = self.font.render(
-            "A Game by NonnagHcaz", True, pygame.Color("white")
-        )
+        font_surface = self.font.render(self.text, True, pygame.Color("white"))
+        self.image = font_surface
         # self.image = self.asset_cache[_fn(os.path.join(config.GFX_DIR, "splash1.png"))]
         self.rect = self.image.get_rect(center=surface.get_rect().center)
         self.cover = surface.copy().convert()
