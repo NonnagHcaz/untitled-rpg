@@ -1,3 +1,4 @@
+import math
 import pygame
 from enum import Enum
 
@@ -11,6 +12,25 @@ logger = logging.getLogger(__name__)
 BLINK_MOD = 30
 
 
+def calculate_level(experience):
+    return int(0.1 * experience**0.5)
+
+
+def calculate_experience(level):
+    return int((10 * level) ** 2)
+
+
+def calculate_experience_gain(current_experience):
+    current_level = calculate_level(current_experience)
+    next_level = current_level + 1
+
+    current_level_experience = calculate_experience(current_level)
+    next_level_experience = calculate_experience(next_level)
+
+    experience_gain = next_level_experience - current_level_experience
+    return experience_gain
+
+
 class Sprite(pygame.sprite.Sprite):
     is_player = False
     is_enemy = False
@@ -22,9 +42,12 @@ class Sprite(pygame.sprite.Sprite):
         SOUTH = 2
         WEST = 3
 
-    def __init__(self, name=None, image=None, debug=False, *groups, **kwargs):
+    def __init__(
+        self, name=None, image=None, debug=False, experience=0, *groups, **kwargs
+    ):
         super().__init__(*groups)
 
+        self.experience = experience
         self.image = image
         self._image = image
         self.debug = debug
@@ -63,6 +86,14 @@ class Sprite(pygame.sprite.Sprite):
         )
 
         return msg
+
+    @property
+    def level(self):
+        return calculate_level(self.experience)
+
+    @property
+    def until_next_level(self):
+        return calculate_experience(self.level + 1) - self.experience
 
     @property
     def vertices(self):
@@ -267,7 +298,6 @@ class LivingSprite(Sprite):
         base_mana=config.DEFAULT_MANA,
         mana_regen=config.DEFAULT_MANA_REGEN,
         base_mana_regen=config.DEFAULT_MANA_REGEN,
-        experience=config.DEFAULT_EXPERIENCE,
         *args,
         **kwargs,
     ):
@@ -290,12 +320,6 @@ class LivingSprite(Sprite):
 
         self.base_mana_regen = base_mana_regen
         self.mana_regen = mana_regen
-
-        self.experience = experience
-
-    @property
-    def level(self):
-        return self.experience // 10 + 1
 
     def update(
         self, regen_health=False, regen_stamina=False, regen_mana=False, *args, **kwargs
@@ -427,6 +451,8 @@ class CombatantSprite(LivingSprite):
         self.force_until_config = {}
         self.is_attacking = False
 
+        self.kill_count = 0
+
     def force_attack_cooldown_until(self, field1, operator1, field2, operator2, equals):
         self.force_until_config = {
             "f1": field1,
@@ -475,6 +501,13 @@ class CombatantSprite(LivingSprite):
         results = {}
         for other in others:
             results[other] = other.defend(self)[self]
+            if not other or not other.alive():
+                self.kill_count += 1
+                self.experience += (
+                    calculate_experience_gain(self.experience) * 10
+                    if getattr(other, "is_boss")
+                    else 1
+                )
 
     def defend(self, *others):
         results = {}

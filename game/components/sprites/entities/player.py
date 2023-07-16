@@ -40,6 +40,8 @@ class Player(Entity):
                 f"size: {r.size}",
                 f"h: {h}, s: {s}, m: {m}",
                 f"cooldown: {self.attack_cooldown_timer} (forced: {self.force_attack_cooldown})",
+                f"kills: {self.kill_count}"
+                f"level: {self.level} ({self.experience})"
                 f"debug: {self.debug}",
             ]
         )
