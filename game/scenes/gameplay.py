@@ -24,11 +24,12 @@ from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 
 
 import logging
-from game.components.sprites.text.text import TargetedTextBox
-from game.components.sprites.ui.health_bar import UIHealthBar, UIManaBar, UIStaminaBar
+from game.components.sprites.text.textbox import TargetedTextBox
+from game.components.sprites.ui.status_bar import UIHealthBar, UIManaBar, UIStaminaBar
 from game.level import Dungeon
 
 from game.scenes.scene import Scene
+from game.utils import resource_path
 from game.utils.asset_cache import _fn
 from game.utils.controls import Controls
 from game.utils.events import ADDENEMY
