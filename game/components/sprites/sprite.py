@@ -297,11 +297,21 @@ class LivingSprite(Sprite):
     def level(self):
         return self.experience // 10 + 1
 
-    def update(self, *args, **kwargs):
+    def update(
+        self, regen_health=False, regen_stamina=False, regen_mana=False, *args, **kwargs
+    ):
         super().update(*args, **kwargs)
-        self.health = min(self.base_health, self.health + self.health_regen)
-        self.mana = min(self.base_mana, self.mana + self.mana_regen)
-        self.stamina = min(self.base_stamina, self.stamina + self.stamina_regen)
+        self.regenerate(regen_health, regen_stamina, regen_mana)
+
+    def regenerate(self, regen_health=False, regen_stamina=False, regen_mana=False):
+        if regen_health:
+            self.health = min(self.base_health, self.health + self.health_regen)
+
+        if regen_mana:
+            self.mana = min(self.base_mana, self.mana + self.mana_regen)
+
+        if regen_stamina:
+            self.stamina = min(self.base_stamina, self.stamina + self.stamina_regen)
 
 
 class MovableSprite(Sprite):
@@ -392,6 +402,7 @@ class CombatantSprite(LivingSprite):
         self.attack_cooldown_timer = 0.0
         self.force_attack_cooldown = False
         self.force_until_config = {}
+        self.is_attacking = False
 
     def force_attack_cooldown_until(self, field1, operator1, field2, operator2, equals):
         self.force_until_config = {

@@ -263,6 +263,7 @@ class GameplayScene(Scene):
         else:
             self.player.direction = self.player.Direction.WEST
 
+        self.player.is_attacking = False
         if pressed_btns[0]:  # left click
             # cursor_collides = self.cursor.collide(self.enemies)
             # for sprite in cursor_collides:
@@ -271,6 +272,7 @@ class GameplayScene(Scene):
                 not self.player.attack_cooldown_timer
                 and getattr(self.player, "mana", config.DEFAULT_PLAYER_MANA) > 0.0
             ):
+                self.player.is_attacking = True
                 sprite = self.level.spawn_orb("orb", self.player, angle)
                 self.player_projectiles.add(sprite)
                 self.projectiles.add(sprite)
@@ -283,12 +285,6 @@ class GameplayScene(Scene):
                     0,
                     self.player.mana - config.DEFAULT_MANA_DRAIN,
                 )
-                if self.player.mana <= 0.0:
-                    self.player.attack_cooldown_timer = 1
-                    self.player.force_attack_cooldown_until(
-                        "mana", "-", "base_mana", "==", 0
-                    )
-
         elif pressed_btns[1]:  # middle mouse button
             pass
         elif pressed_btns[2]:  # right click
@@ -297,6 +293,10 @@ class GameplayScene(Scene):
             pass
         elif pressed_btns[4]:  # next btn
             pass
+
+        if self.player.mana <= 0.0:
+            self.player.attack_cooldown_timer = 100
+            self.player.force_attack_cooldown_until("mana", "-", "base_mana", "==", 0)
 
         # if pressed_btns[0]:  # and pygame.MOUSEBUTTONUP in [x.type for x in events]:
 

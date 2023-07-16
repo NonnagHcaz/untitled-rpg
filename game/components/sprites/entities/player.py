@@ -31,14 +31,7 @@ class Player(Entity):
         fake_pos = None
         if cam:
             fake_pos = r.center - cam
-        msg = f"""
-            name: {n}
-            pos: {r.center} ({fake_pos})
-            dir: {d}
-            size: {r.size}
-            h: {h}, s: {s}, m: {m}
-            debug: {self.debug}
-        """
+
         msg = "\n".join(
             [
                 f"name: {n}",
@@ -46,6 +39,7 @@ class Player(Entity):
                 f"dir: {d}",
                 f"size: {r.size}",
                 f"h: {h}, s: {s}, m: {m}",
+                f"cooldown: {self.attack_cooldown_timer} (forced: {self.force_attack_cooldown})",
                 f"debug: {self.debug}",
             ]
         )
@@ -54,6 +48,14 @@ class Player(Entity):
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
+        regen_stamina = not (self.is_sprinting or self.is_dodging or self.is_swimming)
+        regen_health = True
+        regen_mana = not self.is_attacking
+        self.regenerate(
+            regen_health=regen_health,
+            regen_mana=regen_mana,
+            regen_stamina=regen_stamina,
+        )
 
     def draw_bars(self, surface, *args, **kwargs):
         self.draw_health_bar(surface, *args, **kwargs)
