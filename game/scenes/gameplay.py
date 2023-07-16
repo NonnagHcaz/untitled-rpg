@@ -189,8 +189,11 @@ class GameplayScene(Scene):
         if event.type == pygame.QUIT:
             self.quit = True
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                self.next_state = "PAUSE"
+            if (
+                event.key == pygame.K_ESCAPE
+                and self.current_time - self.start_time > 1 / 1000
+            ):
+                self.next_scene = "PAUSE"
                 self.done = True
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_k:
