@@ -49,7 +49,7 @@ class StartupScene(LoadingScene):
         self.wait = False
 
     def get_event(self, event):
-        """Get events from Control. Currently changes to next state on any key
+        """Get events from Control. Currently changes to next scene on any key
         press."""
         if event.type == pygame.KEYDOWN and self.wait:
             self.done = True

@@ -14,15 +14,15 @@ from game.game import Game
 if __name__ == "__main__":
     game = Game()
     kwargs = {"game": game, "asset_cache": game.asset_cache}
-    states = {
+    scenes = {
         "SPLASH": SplashScene(**kwargs),
         "GAME": GameplayScene(**kwargs),
         "STARTUP": StartupScene(**kwargs),
         "MENU": MainMenuScene(**kwargs),
         "PAUSE": PauseMenuScene(**kwargs),
     }
-    states["STARTUP"].next_state = "SPLASH"
-    states["SPLASH"].next_state = "MENU"
+    scenes["STARTUP"].next_scene = "SPLASH"
+    scenes["SPLASH"].next_scene = "MENU"
 
-    game.setup_states(states, "STARTUP")
+    game.setup_scenes(scenes, "STARTUP")
     game.run()

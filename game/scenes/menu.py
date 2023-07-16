@@ -237,11 +237,11 @@ class MainMenuScene(Scene):
 
     def start_game(self):
         logger.debug("Switching to GameplayState")
-        self.next_state = "GAME"
+        self.next_scene = "GAME"
         self.done = True
 
     def load_game(self):
-        self.next_state = "GAME"
+        self.next_scene = "GAME"
         self.done = True
         self.game.load_game(config.SAVE_FILE, "GAME")
 
@@ -273,14 +273,14 @@ class PauseMenuScene(MainMenuScene):
 
     def resume_game(self):
         logger.debug("Switching to GameplayState")
-        self.next_state = "GAME"
+        self.next_scene = "GAME"
         self.done = True
 
     def save_game(self):
-        self.next_state = "GAME"
+        self.next_scene = "GAME"
         self.done = True
         self.game.save_game(config.SAVE_FILE, "GAME")
 
     def quit_to_menu(self):
-        self.next_state = "MENU"
+        self.next_scene = "MENU"
         self.done = True

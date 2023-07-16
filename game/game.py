@@ -53,11 +53,11 @@ class Game(object):
         self.show_fps = True
         self.current_time = 0.0
 
-        self.state_dict = {}
-        self.current_state_name = None
-        self.current_state = None
-        self.previous_state = None
-        self.next_state = None
+        self.scene_dict = {}
+        self.current_scene_name = None
+        self.current_scene = None
+        self.previous_scene = None
+        self.next_scene = None
 
         self.asset_cache = AssetCache()
 
@@ -76,13 +76,13 @@ class Game(object):
 
         return largest_size
 
-    def save_game(self, filename, state_name="GAME"):
-        state = self.state_dict.get(state_name, self.current_state)
+    def save_game(self, filename, scene_name="GAME"):
+        scene = self.scene_dict.get(scene_name, self.current_scene)
 
         game_state = {
             "player_position": (
-                state.player.rect.x,
-                state.player.rect.y,
+                scene.player.rect.x,
+                scene.player.rect.y,
             ),
             # Add more game state variables as needed
         }
@@ -99,16 +99,16 @@ class Game(object):
         except FileNotFoundError:
             logger.warning("No save file found.")
 
-        self.current_state.next_state = "GAME"
-        self.flip_state()
+        self.current_scene.next_scene = "GAME"
+        self.flip_scene()
 
-    def setup_states(self, state_dict, start_state):
+    def setup_scenes(self, scene_dict, start_scene):
         """Given a dictionary of States and a State to start in,
-        builds the self.state_dict."""
-        self.state_dict = state_dict
-        self.current_state_name = start_state
-        self.current_state = self.state_dict[self.current_state_name]
-        self.current_state.startup(self.current_time, None, self.screen)
+        builds the self.scene_dict."""
+        self.scene_dict = scene_dict
+        self.current_scene_name = start_scene
+        self.current_scene = self.scene_dict[self.current_scene_name]
+        self.current_scene.startup(self.current_time, None, self.screen)
 
     def event_loop(self):
         """Process all events and pass them down to current State.  The f5 key
@@ -127,42 +127,42 @@ class Game(object):
                 self.screen = pygame.display.get_surface()
                 r1 = self.screen.copy().get_rect()
 
-            self.current_state.get_event(event)
+            self.current_scene.get_event(event)
 
-    def flip_state(self):
+    def flip_scene(self):
         """When a State changes to done necessary startup and cleanup functions
         are called and the current State is changed."""
-        self.previous_state, self.current_state_name = (
-            self.current_state,
-            self.current_state.next_state,
+        self.previous_scene, self.current_scene_name = (
+            self.current_scene,
+            self.current_scene.next_scene,
         )
-        persist = self.current_state.cleanup()
+        persist = self.current_scene.cleanup()
         try:
-            self.next_state = self.state_dict[self.current_state_name]
-            self.next_state.startup(self.current_time, persist, self.screen)
-            self.next_state.previous_state = self.previous_state
-            self.current_state = self.next_state
+            self.next_scene = self.scene_dict[self.current_scene_name]
+            self.next_scene.startup(self.current_time, persist, self.screen)
+            self.next_scene.previous_scene = self.previous_scene
+            self.current_scene = self.next_scene
         except KeyError:
             self.done = True
 
     def update(self, dt):
         """
-        Check for state flip and update active state.
+        Check for scene flip and update active scene.
 
         dt: milliseconds since last frame
         """
         self.screen.fill((0, 0, 0))
         self.current_time = pygame.time.get_ticks()
         self.keys = pygame.key.get_pressed()
-        if self.current_state.quit:
+        if self.current_scene.quit:
             self.done = True
-        elif self.current_state.done:
-            self.flip_state()
+        elif self.current_scene.done:
+            self.flip_scene()
 
         if not self.done:
-            self.current_state.update(self.screen, self.current_time, dt)
+            self.current_scene.update(self.screen, self.current_time, dt)
             fps = self.clock.get_fps()
-            with_fps = f"{self.caption} - {fps:.2f} FPS - {self.current_state.zoom*100:.0f}% Zoom"
+            with_fps = f"{self.caption} - {fps:.2f} FPS - {self.current_scene.zoom*100:.0f}% Zoom"
             pygame.display.set_caption(with_fps)
 
     def toggle_show_fps(self, key):
