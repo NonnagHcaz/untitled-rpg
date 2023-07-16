@@ -412,12 +412,13 @@ class CombatantSprite(LivingSprite):
             "op2": operator2,
             "eq": equals,
         }
+        self.force_attack_cooldown = True
 
     def toggle_force_attack_cooldown(self):
         self.force_attack_cooldown = not self.force_attack_cooldown
 
     def _check_forced_done(self):
-        if not self.force_until_config:
+        if not (self.force_attack_cooldown or self.force_until_config):
             return True
         f1 = self.force_until_config.get("f1")
         f2 = self.force_until_config.get("f2")
@@ -441,10 +442,11 @@ class CombatantSprite(LivingSprite):
             self.toggle_force_attack_cooldown()
             self.attack_cooldown_timer = 0
 
-        self.attack_cooldown_timer = max(
-            0.0 if not self.force_attack_cooldown else 1.0,
-            self.attack_cooldown_timer - self.attack_cooldown,
-        )
+        if not self.force_attack_cooldown:
+            self.attack_cooldown_timer = max(
+                0.0,
+                self.attack_cooldown_timer - self.attack_cooldown,
+            )
 
     def attack(self, *others):
         results = {}
