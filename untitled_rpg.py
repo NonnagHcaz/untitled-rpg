@@ -1,7 +1,5 @@
-import sys
 import os
 import logging
-from game import config
 from game.scenes.menu import MainMenuScene, PauseMenuScene
 from game.scenes.splash import SplashScene
 from game.scenes.gameplay import GameplayScene
@@ -15,13 +13,13 @@ from game.game import Game
 
 if __name__ == "__main__":
     game = Game()
-    config = {"game": game, "asset_cache": game.asset_cache}
+    kwargs = {"game": game, "asset_cache": game.asset_cache}
     states = {
-        "SPLASH": SplashScene(**config),
-        "GAME": GameplayScene(**config),
-        "STARTUP": StartupScene(**config),
-        "MENU": MainMenuScene(**config),
-        "PAUSE": PauseMenuScene(**config),
+        "SPLASH": SplashScene(**kwargs),
+        "GAME": GameplayScene(**kwargs),
+        "STARTUP": StartupScene(**kwargs),
+        "MENU": MainMenuScene(**kwargs),
+        "PAUSE": PauseMenuScene(**kwargs),
     }
     states["STARTUP"].next_state = "SPLASH"
     states["SPLASH"].next_state = "MENU"
