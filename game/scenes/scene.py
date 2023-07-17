@@ -9,13 +9,12 @@ class Scene(object):
     must be overloaded in the childclass.  startup and cleanup need to be
     overloaded when there is data that must persist between States."""
 
-    def __init__(self, game, asset_cache):
+    def __init__(self, game, asset_cache, next_scene=None, previous_scene=None):
+        self.previous_scene = previous_scene
         self.start_time = 0.0
         self.current_time = 0.0
         self.done = False
         self.quit = False
-        self.next = None
-        self.previous = None
         self.persist = {}
         self.screen = None
         self.total_frames = 0
@@ -25,8 +24,7 @@ class Scene(object):
 
         self.game = game
         self.asset_cache = asset_cache
-        self.previous_scene = None
-        self.next_scene = None
+        self.next_scene = next_scene
         self.screen = self.game.screen.copy()
         self.screen_rect = self.screen.get_rect()
         self.screen_size = self.screen_rect.size

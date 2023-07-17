@@ -42,8 +42,13 @@ from .. import config
 
 
 class GameplayScene(Scene):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, game, asset_cache, next_scene=None, previous_scene=None):
+        super().__init__(
+            game=game,
+            asset_cache=asset_cache,
+            next_scene=next_scene,
+            previous_scene=previous_scene,
+        )
         self.level = None
         self.player = None
         self.enemies = None

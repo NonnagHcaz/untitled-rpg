@@ -14,13 +14,23 @@ from .. import config
 
 
 class LoadingScene(Scene):
-    def __init__(self, game, asset_cache):
-        super().__init__(game, asset_cache)
+    def __init__(self, game, asset_cache, next_scene=None, previous_scene=None):
+        super().__init__(
+            game=game,
+            asset_cache=asset_cache,
+            next_scene=next_scene,
+            previous_scene=previous_scene,
+        )
 
 
 class StartupScene(LoadingScene):
-    def __init__(self, game, asset_cache):
-        super().__init__(game, asset_cache)
+    def __init__(self, game, asset_cache, next_scene=None, previous_scene=None):
+        super().__init__(
+            game=game,
+            asset_cache=asset_cache,
+            next_scene=next_scene,
+            previous_scene=previous_scene,
+        )
 
         self.assets = [
             ("font", filepath, 24)

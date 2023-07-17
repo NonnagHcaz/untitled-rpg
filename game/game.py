@@ -132,18 +132,24 @@ class Game(object):
     def flip_scene(self):
         """When a State changes to done necessary startup and cleanup functions
         are called and the current State is changed."""
-        self.previous_scene, self.current_scene_name = (
+        self.previous_scene, self.previous_scene_name = (
             self.current_scene,
-            self.current_scene.next_scene,
+            self.current_scene_name,
         )
+
         persist = self.current_scene.cleanup()
-        try:
-            self.next_scene = self.scene_dict[self.current_scene_name]
-            self.next_scene.startup(self.current_time, persist, self.screen)
-            self.next_scene.previous_scene = self.previous_scene
-            self.current_scene = self.next_scene
-        except KeyError:
-            self.done = True
+
+        self.next_scene_name = self.current_scene.next_scene
+        self.next_scene = self.scene_dict[self.next_scene_name]
+        self.next_scene.previous_scene = self.previous_scene_name
+        self.next_scene.startup(self.current_time, persist, self.screen)
+
+        self.current_scene, self.current_scene_name = (
+            self.next_scene,
+            self.next_scene_name,
+        )
+
+        logger.debug(f"Flipping to {self.current_scene_name} ({self.next_scene})")
 
     def update(self, dt):
         """

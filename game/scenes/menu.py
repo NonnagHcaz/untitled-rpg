@@ -127,8 +127,13 @@ class MenuButton(MenuText):
 
 
 class MainMenuScene(Scene):
-    def __init__(self, game, asset_cache):
-        super().__init__(game, asset_cache)
+    def __init__(self, game, asset_cache, next_scene=None, previous_scene=None):
+        super().__init__(
+            game=game,
+            asset_cache=asset_cache,
+            next_scene=next_scene,
+            previous_scene=previous_scene,
+        )
 
         self.options = [
             ("Start Game", self.start_game),
@@ -262,8 +267,13 @@ class MainMenuScene(Scene):
 
 
 class PauseMenuScene(MainMenuScene):
-    def __init__(self, game, asset_cache):
-        super().__init__(game, asset_cache)
+    def __init__(self, game, asset_cache, next_scene=None, previous_scene=None):
+        super().__init__(
+            game=game,
+            asset_cache=asset_cache,
+            next_scene=next_scene,
+            previous_scene=previous_scene,
+        )
         self.options = [
             ("Resume", self.resume_game),
             ("Save Game", self.save_game),

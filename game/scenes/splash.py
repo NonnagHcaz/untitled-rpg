@@ -16,8 +16,21 @@ import os
 class SplashScene(Scene):
     """This State is updated while our game shows the splash screen."""
 
-    def __init__(self, game, asset_cache, timeout=3, text="A Game by NonnagHcaz"):
-        super().__init__(game, asset_cache)
+    def __init__(
+        self,
+        game,
+        asset_cache,
+        next_scene=None,
+        previous_scene=None,
+        timeout=3,
+        text="A Game by NonnagHcaz",
+    ):
+        super().__init__(
+            game=game,
+            asset_cache=asset_cache,
+            next_scene=next_scene,
+            previous_scene=previous_scene,
+        )
         self.timeout = timeout
         self.text = text
 
