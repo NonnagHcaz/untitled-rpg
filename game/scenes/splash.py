@@ -35,7 +35,7 @@ class SplashScene(Scene):
         self.text = text
 
     def startup(self, current_time, persistant, surface):
-        self.font_file = os.path.join(config.FONT_DIR, "PixeloidSans.ttf")
+        self.font_file = config.FONT_FILE
         self.font = pygame.font.Font(self.font_file, 64)
         font_surface = self.font.render(self.text, True, pygame.Color("white"))
         self.image = font_surface

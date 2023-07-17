@@ -147,7 +147,7 @@ class MainMenuScene(Scene):
 
         self.elements = []
 
-        self.font_file = os.path.join(config.FONT_DIR, "PixeloidSans.ttf")
+        self.font_file = config.FONT_FILE
         self.heading_font_size = 32
         self.button_font_size = 24
 

@@ -126,7 +126,7 @@ class StartupScene(LoadingScene):
 
         # Draw loading text
 
-        font = pygame.font.Font(os.path.join(config.FONT_DIR, "PixeloidSans.ttf"), 24)
+        font = pygame.font.Font(config.FONT_FILE, 24)
         text_surface = font.render(self.loading_text, True, pygame.Color("white"))
         text_rect = text_surface.get_rect(
             center=(screen_width // 2, screen_height // 2 + 50)
