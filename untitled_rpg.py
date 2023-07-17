@@ -1,6 +1,6 @@
 import os
 import logging
-from game.scenes.menu import MainMenuScene, PauseMenuScene
+from game.scenes.menu import MainMenuScene, PauseMenuScene, OptionsMenuScene
 from game.scenes.splash import SplashScene
 from game.scenes.gameplay import GameplayScene
 from game.scenes.loading import StartupScene
@@ -24,6 +24,7 @@ if __name__ == "__main__":
         "STARTUP": StartupScene(**kwargs),
         "MENU": MainMenuScene(**kwargs),
         "PAUSE": PauseMenuScene(**kwargs),
+        "OPTIONS": OptionsMenuScene(**kwargs),
     }
     scenes["STARTUP"].next_scene = "SPLASH"
     scenes["SPLASH"].next_scene = "MENU"

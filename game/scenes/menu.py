@@ -52,7 +52,7 @@ class MenuButton(MenuText):
         focus_color=pygame.Color("yellow"),
         focus_border_color=pygame.Color("yellow"),
         focus_border_width=2,
-        *groups
+        *groups,
     ):
         super().__init__(text, font, color, *groups)
         self.hover_color = hover_color
@@ -138,6 +138,7 @@ class MainMenuScene(Scene):
         self.options = [
             ("Start Game", self.start_game),
             ("Load Game", self.load_game),
+            ("Options", self.goto_options),
             ("Exit", self.exit_game),
         ]
         self.heading_text = config.CAPTION
@@ -250,6 +251,11 @@ class MainMenuScene(Scene):
         self.done = True
         self.game.load_game(config.SAVE_FILE, "GAME")
 
+    def goto_options(self):
+        logger.debug("Switching to OptionMenuState")
+        self.next_scene = "OPTIONS"
+        self.done = True
+
     def exit_game(self):
         self.game.done = True
 
@@ -277,6 +283,7 @@ class PauseMenuScene(MainMenuScene):
         self.options = [
             ("Resume", self.resume_game),
             ("Save Game", self.save_game),
+            ("Options", self.goto_options),
             ("Quit to Menu", self.quit_to_menu),
         ]
         self.heading_text = "Paused"
@@ -303,3 +310,33 @@ class PauseMenuScene(MainMenuScene):
             and event.key == pygame.K_ESCAPE
         ):
             self.resume_game()
+
+
+class OptionsMenuScene(MainMenuScene):
+    def __init__(self, game, asset_cache, next_scene=None, previous_scene=None):
+        super().__init__(
+            game=game,
+            asset_cache=asset_cache,
+            next_scene=next_scene,
+            previous_scene=previous_scene,
+        )
+        self.options = [
+            ("Back", self.goto_previous_scene),
+            # ("Save Game", self.save_game),
+            # ("Quit to Menu", self.quit_to_menu),
+        ]
+        self.heading_text = "Options"
+
+    def goto_previous_scene(self):
+        logger.debug(f"Switching to {self.previous_scene}")
+        self.next_scene = self.previous_scene
+        self.done = True
+
+    def get_event(self, event):
+        super().get_event(event)
+        if (
+            self.current_time - self.start_time > 1 / 1000
+            and event.type == pygame.KEYDOWN
+            and event.key == pygame.K_ESCAPE
+        ):
+            self.goto_previous_scene()
