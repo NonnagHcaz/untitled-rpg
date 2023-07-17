@@ -100,10 +100,6 @@ class Level(object):
 
         self.display_width = display_width
         self.display_height = display_height
-        self.spritesheets = {
-            "0x72d2": os.path.join(config.GFX_DIR, "0x72_DungeonTilesetII_v1.6.png"),
-            "0x72ex": os.path.join(config.GFX_DIR, "dungeontileset-extended.png"),
-        }
 
     @property
     def size(self):
@@ -146,7 +142,7 @@ class Level(object):
         self, name, origin, angle, image=None, sprite_class=Projectile, **kwargs
     ):
         if image is None and name:
-            image = self.cache[(self.spritesheets["0x72d2"], name)]
+            image = self.cache[(config.SPRITESHEETS["0x72d2"]["filepath"], name)]
         x, y = origin.rect.center
         sprite = sprite_class(
             name=name, image=image, angle=angle, walk_speed=10, damage=10, **kwargs
@@ -183,23 +179,27 @@ class Level(object):
 
     def spawn_arrow(self, origin, angle):
         name = "weapon_arrow"
-        image = self.cache[(self.spritesheets["0x72d2"], name)]
+        image = self.cache[(config.SPRITESHEETS["0x72d2"]["filepath"], name)]
 
         # sprite.spawn(x=self.width//2, y=self.height//2)
         return self.spawn_projectile(name, origin, angle, image, sprite_class=Arrow)
 
-    def spawn_player(self):
-        return self.spawn_male_wizzard(is_player=True)
+    def spawn_player(self, pos=(None, None)):
+        return self.spawn_male_wizzard(is_player=True, pos=pos)
 
     def spawn_sprite(
         self, name="knight_m", pos=(None, None), is_player=False, is_enemy=False
     ):
         idle_frames = [
-            self.cache[(self.spritesheets["0x72d2"], f"{name}_idle_anim_f{x}")]
+            self.cache[
+                (config.SPRITESHEETS["0x72d2"]["filepath"], f"{name}_idle_anim_f{x}")
+            ]
             for x in range(0, 4)
         ]
         walk_frames = [
-            self.cache[(self.spritesheets["0x72d2"], f"{name}_run_anim_f{x}")]
+            self.cache[
+                (config.SPRITESHEETS["0x72d2"]["filepath"], f"{name}_run_anim_f{x}")
+            ]
             for x in range(0, 4)
         ]
 
@@ -286,7 +286,8 @@ class Level(object):
         tiles = []
 
         floor_frames = [
-            self.cache[(self.spritesheets["0x72d2"], f"floor_{x}")] for x in range(1, 9)
+            self.cache[(config.SPRITESHEETS["0x72d2"]["filepath"], f"floor_{x}")]
+            for x in range(1, 9)
         ]
         _t0 = floor_frames[0].get_rect()
         _tw, _th = _t0.width, _t0.height
@@ -303,7 +304,7 @@ class Level(object):
         for x in range(0, self.width, _tw):
             y = self.height - _th * 1.5
             name = "edge_down"
-            image = self.cache[(self.spritesheets["0x72d2"], name)]
+            image = self.cache[(config.SPRITESHEETS["0x72d2"]["filepath"], name)]
             sprite = Sprite(name=name, image=image)
             sprite.spawn(pos=(x, y))
             tiles.append(sprite)
@@ -321,7 +322,9 @@ class Level(object):
         _gw, _gh = self.width, self.height
         _gw50, _gh50 = _gw // 2, _gh // 2
 
-        _t0 = self.cache[(self.spritesheets["0x72d2"], "wall_edge_top_left")].get_rect()
+        _t0 = self.cache[
+            (config.SPRITESHEETS["0x72d2"]["filepath"], "wall_edge_top_left")
+        ].get_rect()
         _tw, _th = _t0.width, _t0.height
         _bx, _by = _gw // _tw, _gh // _th
 
@@ -351,7 +354,9 @@ class Level(object):
                 else:
                     name = None
                 if name:
-                    image = self.cache[(self.spritesheets["0x72d2"], name)]
+                    image = self.cache[
+                        (config.SPRITESHEETS["0x72d2"]["filepath"], name)
+                    ]
                     sprite = Sprite(name=name, image=image)
                     sprite.spawn(pos=(x, y))
                     tiles.append(sprite)

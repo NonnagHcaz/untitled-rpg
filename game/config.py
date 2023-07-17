@@ -87,6 +87,43 @@ SAVE_FILE = os.path.join(SAVE_DIR, "save.dat")
 DISPLAY_FILE = os.path.join(CONF_DIR, "display.json")
 SOUND_FILE = os.path.join(CONF_DIR, "sound.json")
 
+SPRITESHEETS = {
+    "0x72d2": {
+        "filepath": os.path.join(GFX_DIR, "0x72_DungeonTilesetII_v1.6.png"),
+        "enemies": {
+            "dual_anim": [
+                "tiny_zombie",
+                "goblin",
+                "imp",
+                "skelet",
+                "masked_orc",
+                "orc_warrior",
+                "orc_shaman",
+                "wogol",
+                "chort",
+                "angel",
+                "pumpkin_dude",
+                "doc",
+            ],
+            "idle_only": [
+                "muddy",
+                "swampy",
+                "zombie",
+                "ice_zombie",
+                "necromancer",
+                "slug",
+                "tiny_slug",
+            ],
+            "bosses": ["big_zombie", "ogre", "big_demon"],
+        },
+        "heroes": {"dual_anim": [], "idle_only": []},
+        "NPCs": {"dual_anim": [], "idle_only": [], "no_anim": []},
+    },
+    "0x72ex": {"filepath": os.path.join(GFX_DIR, "dungeontileset-extended.png")},
+}
+
+FONT_FILE = os.path.join(FONT_DIR, "PixeloidSans.ttf")
+
 # region Movement Keys
 
 DEFAULT_MOVE_UP_PRIMARY_KEY = K_w
