@@ -5,7 +5,7 @@ This is my labor of love project to learn game development with Python and to ma
 
 Don't expect much.
 
-[Extremely Early Access release 0.0.1](https://github.com/NonnagHcaz/untitled-rpg/releases) out now!
+[Version 0.0.2: UI Part 1](https://github.com/NonnagHcaz/untitled-rpg/releases) out now!
 
 Setup
 -----
