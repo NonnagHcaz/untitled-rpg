@@ -3,8 +3,8 @@
 import pygame
 
 
-class GameState(object):
-    """This is a prototype class for States.  All states should inherit from it.
+class Scene(object):
+    """This is a prototype class for States.  All scenes should inherit from it.
     No direct instances of this class should be created. get_event and update
     must be overloaded in the childclass.  startup and cleanup need to be
     overloaded when there is data that must persist between States."""
@@ -25,8 +25,8 @@ class GameState(object):
 
         self.game = game
         self.asset_cache = asset_cache
-        self.previous_state = None
-        self.next_state = None
+        self.previous_scene = None
+        self.next_scene = None
         self.screen = self.game.screen.copy()
         self.screen_rect = self.screen.get_rect()
         self.screen_size = self.screen_rect.size
@@ -51,7 +51,7 @@ class GameState(object):
         return self.persist
 
     def update(self, surface, current_time):
-        """Update function for state.  Must be overloaded in children."""
+        """Update function for scene.  Must be overloaded in children."""
         self.current_time = current_time
         self.total_frames += 1
 

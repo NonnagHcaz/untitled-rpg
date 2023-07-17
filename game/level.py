@@ -5,9 +5,13 @@ import pygame
 from game import config
 from game.components.sprites.entities.enemies.enemy import Enemy
 from game.components.sprites.entities.entity import Entity
-from game.components.sprites.entities.player.player import Player
+from game.components.sprites.entities.player import Player
 from game.components.sprites.sprite import MovableSprite, Sprite, MergedSprite
-from game.components.sprites.weapons.weapon import Arrow, Projectile
+from game.components.sprites.weapons.weapon import (
+    Arrow,
+    MagicOrb,
+    Projectile,
+)
 
 
 class AutoTileset(object):
@@ -138,12 +142,14 @@ class Level(object):
 
         return self.spawn_sprite(random.choice(choices), pos, is_enemy=True)
 
-    def spawn_projectile(self, name, origin, angle, image=None):
-        if image is None:
+    def spawn_projectile(
+        self, name, origin, angle, image=None, sprite_class=Projectile, **kwargs
+    ):
+        if image is None and name:
             image = self.cache[(self.spritesheets["0x72d2"], name)]
         x, y = origin.rect.center
-        sprite = Projectile(
-            name=name, image=image, angle=angle, walk_speed=10, damage=10
+        sprite = sprite_class(
+            name=name, image=image, angle=angle, walk_speed=10, damage=10, **kwargs
         )
         sprite.spawn(pos=(x, y))
         # sprite.spawn(x=self.width//2, y=self.height//2)
@@ -160,38 +166,27 @@ class Level(object):
         border_width=1,
     ):
         name = "weapon_orb"
-        image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
-        # image.fill()
-        if not color:
-            r = random.randint(0, 255)
-            g = random.randint(0, 255)
-            b = random.randint(0, 255)
-            color = (r, g, b)
-        if not border_color:
-            r = random.randint(0, 255)
-            g = random.randint(0, 255)
-            b = random.randint(0, 255)
-            border_color = (r, g, b)
-        if border_width:
-            pygame.draw.circle(
-                surface=image,
-                color=border_color,
-                center=(radius, radius),
-                radius=radius,
-                width=border_width,
-            )
-        pygame.draw.circle(
-            surface=image, color=color, center=(radius, radius), radius=radius
-        )
 
-        return self.spawn_projectile(name, origin, angle, image)
+        return self.spawn_projectile(
+            name=name,
+            origin=origin,
+            angle=angle,
+            sprite_class=MagicOrb,
+            amplitude=1,
+            frequency=1,
+            image="delay",
+            color=color,
+            radius=radius,
+            border_color=border_color,
+            border_width=border_width,
+        )
 
     def spawn_arrow(self, origin, angle):
         name = "weapon_arrow"
         image = self.cache[(self.spritesheets["0x72d2"], name)]
 
         # sprite.spawn(x=self.width//2, y=self.height//2)
-        return self.spawn_projectile(name, origin, angle, image)
+        return self.spawn_projectile(name, origin, angle, image, sprite_class=Arrow)
 
     def spawn_player(self):
         return self.spawn_male_wizzard(is_player=True)

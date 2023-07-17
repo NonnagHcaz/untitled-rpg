@@ -1,1 +1,1 @@
-pyinstaller untitled_rpg.spec
+pyinstaller --clean untitled_rpg.spec

@@ -3,29 +3,29 @@ The splash screen of the game. The first thing the user sees.
 """
 
 import pygame
-from game.components.sprites.text.text import Text
+from game.components.sprites.text.textbox import TextBox
 from game.utils import resource_path
 
 from game.utils.asset_cache import _fn
 
-from .state import GameState
+from .scene import Scene
 from .. import config
 import os
 
 
-class SplashState(GameState):
+class SplashScene(Scene):
     """This State is updated while our game shows the splash screen."""
 
-    def __init__(self, game, asset_cache):
+    def __init__(self, game, asset_cache, timeout=3, text="A Game by NonnagHcaz"):
         super().__init__(game, asset_cache)
-        self.timeout = 5
+        self.timeout = timeout
+        self.text = text
 
     def startup(self, current_time, persistant, surface):
         self.font_file = os.path.join(config.FONT_DIR, "PixeloidSans.ttf")
         self.font = pygame.font.Font(self.font_file, 64)
-        self.image = self.font.render(
-            "A Game by NonnagHcaz", True, pygame.Color("white")
-        )
+        font_surface = self.font.render(self.text, True, pygame.Color("white"))
+        self.image = font_surface
         # self.image = self.asset_cache[_fn(os.path.join(config.GFX_DIR, "splash1.png"))]
         self.rect = self.image.get_rect(center=surface.get_rect().center)
         self.cover = surface.copy().convert()
@@ -45,7 +45,7 @@ class SplashState(GameState):
             self.done = True
 
     def get_event(self, event):
-        """Get events from Control. Currently changes to next state on any key
+        """Get events from Control. Currently changes to next scene on any key
         press."""
         if event.type == pygame.KEYDOWN:
             self.done = True

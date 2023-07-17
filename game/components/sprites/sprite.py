@@ -1,13 +1,34 @@
+import math
 import pygame
-from .defaults import *
 from enum import Enum
 
 import logging
+
+from game import config
 
 logger = logging.getLogger(__name__)
 
 
 BLINK_MOD = 30
+
+
+def calculate_level(experience):
+    return int(0.1 * experience**0.5)
+
+
+def calculate_experience(level):
+    return int((10 * level) ** 2)
+
+
+def calculate_experience_gain(current_experience):
+    current_level = calculate_level(current_experience)
+    next_level = current_level + 1
+
+    current_level_experience = calculate_experience(current_level)
+    next_level_experience = calculate_experience(next_level)
+
+    experience_gain = next_level_experience - current_level_experience
+    return experience_gain
 
 
 class Sprite(pygame.sprite.Sprite):
@@ -21,9 +42,12 @@ class Sprite(pygame.sprite.Sprite):
         SOUTH = 2
         WEST = 3
 
-    def __init__(self, name=None, image=None, debug=False):
-        super().__init__()
+    def __init__(
+        self, name=None, image=None, debug=False, experience=0, *groups, **kwargs
+    ):
+        super().__init__(*groups)
 
+        self.experience = experience
         self.image = image
         self._image = image
         self.debug = debug
@@ -51,8 +75,25 @@ class Sprite(pygame.sprite.Sprite):
         fake_pos = None
         if cam:
             fake_pos = r.center - cam
-        msg = f"name: {n}\nreal pos: {r.center}\nfake pos: {fake_pos}\n{d}\nsize: {r.size}\ndebug: {self.debug}"
+        msg = "\n".join(
+            [
+                f"name: {n}",
+                f"pos: {r.center} ({fake_pos})",
+                f"dir: {d}",
+                f"size: {r.size}",
+                f"debug: {self.debug}",
+            ]
+        )
+
         return msg
+
+    @property
+    def level(self):
+        return calculate_level(self.experience)
+
+    @property
+    def until_next_level(self):
+        return calculate_experience(self.level + 1) - self.experience
 
     @property
     def vertices(self):
@@ -105,27 +146,26 @@ class Sprite(pygame.sprite.Sprite):
         return self.image
 
     def draw_hitbox(self):
-        pygame.draw.rect(self.image, pygame.Color("red"), self.rect, 3)
+        pygame.draw.rect(self.image, config.HEALTH_RED, self.rect, 3)
 
-    def update(self, surface, camera=None):
-        cam = camera
+    def update(self, *args, **kwargs):
         self.draw()
 
     def draw(self):
-        # if self.blink_timer or self.blink_persist:
-        #     if not hasattr(self, "original_image"):
-        #         self.original_image = self.image
-        #     if self.blink_timer % BLINK_MOD:
-        #         self.image = self.original_image
-        #     else:
-        #         self.image = pygame.Surface(self.rect.size)
-        #         self.image.fill(self.blink_color)
-        #     self.blink_timer = max(0, self.blink_timer - 1)
-        #     if not self.blink_timer:
-        #         if self.blink_persist:
-        #             self.blink_timer = BLINK_MOD
-        #         else:
-        #             delattr(self, "original_image")
+        if self.blink_timer or self.blink_persist:
+            if not hasattr(self, "original_image"):
+                self.original_image = self.image
+            if self.blink_timer % BLINK_MOD:
+                self.image = self.original_image
+            else:
+                self.image = pygame.Surface(self.rect.size)
+                self.image.fill(self.blink_color)
+            self.blink_timer = max(0, self.blink_timer - 1)
+            if not self.blink_timer:
+                if self.blink_persist:
+                    self.blink_timer = BLINK_MOD
+                else:
+                    delattr(self, "original_image")
 
         if self.debug:
             self.draw_hitbox()
@@ -236,7 +276,7 @@ class AnimatedSprite(Sprite):
             for x in range(bf):
                 yield None
 
-    def update(self, surface, camera=None):
+    def update(self, surface, camera=None, *args, **kwargs):
         super().update(surface, camera)
         next(self.animation)
         if self.debug:
@@ -246,19 +286,18 @@ class AnimatedSprite(Sprite):
 class LivingSprite(Sprite):
     def __init__(
         self,
-        health=DEFAULT_HEALTH,
-        base_health=DEFAULT_HEALTH,
-        health_regen=DEFAULT_HEALTH_REGEN,
-        base_health_regen=DEFAULT_HEALTH_REGEN,
-        stamina=DEFAULT_STAMINA,
-        base_stamina=DEFAULT_STAMINA,
-        stamina_regen=DEFAULT_STAMINA_REGEN,
-        base_stamina_regen=DEFAULT_STAMINA_REGEN,
-        mana=DEFAULT_MANA,
-        base_mana=DEFAULT_MANA,
-        mana_regen=DEFAULT_MANA_REGEN,
-        base_mana_regen=DEFAULT_MANA_REGEN,
-        experience=DEFAULT_EXPERIENCE,
+        health=config.DEFAULT_HEALTH,
+        base_health=config.DEFAULT_HEALTH,
+        health_regen=config.DEFAULT_HEALTH_REGEN,
+        base_health_regen=config.DEFAULT_HEALTH_REGEN,
+        stamina=config.DEFAULT_STAMINA,
+        base_stamina=config.DEFAULT_STAMINA,
+        stamina_regen=config.DEFAULT_STAMINA_REGEN,
+        base_stamina_regen=config.DEFAULT_STAMINA_REGEN,
+        mana=config.DEFAULT_MANA,
+        base_mana=config.DEFAULT_MANA,
+        mana_regen=config.DEFAULT_MANA_REGEN,
+        base_mana_regen=config.DEFAULT_MANA_REGEN,
         *args,
         **kwargs,
     ):
@@ -282,21 +321,31 @@ class LivingSprite(Sprite):
         self.base_mana_regen = base_mana_regen
         self.mana_regen = mana_regen
 
-        self.experience = experience
+    def update(
+        self, regen_health=False, regen_stamina=False, regen_mana=False, *args, **kwargs
+    ):
+        super().update(*args, **kwargs)
+        self.regenerate(regen_health, regen_stamina, regen_mana)
 
-    @property
-    def level(self):
-        return self.experience // 10 + 1
+    def regenerate(self, regen_health=False, regen_stamina=False, regen_mana=False):
+        if regen_health:
+            self.health = min(self.base_health, self.health + self.health_regen)
+
+        if regen_mana:
+            self.mana = min(self.base_mana, self.mana + self.mana_regen)
+
+        if regen_stamina:
+            self.stamina = min(self.base_stamina, self.stamina + self.stamina_regen)
 
 
 class MovableSprite(Sprite):
     def __init__(
         self,
-        walk_speed=DEFAULT_WALK_SPEED,
-        walk_speed_modifier=DEFAULT_WALK_SPEED_MODIFIER,
-        swim_speed_modifier=DEFAULT_SWIM_SPEED_MODIFIER,
-        crouch_speed_modifier=DEFAULT_CROUCH_SPEED_MODIFIER,
-        sprint_speed_modifier=DEFAULT_SPRINT_SPEED_MODIFIER,
+        walk_speed=config.DEFAULT_WALK_SPEED,
+        walk_speed_modifier=config.DEFAULT_WALK_SPEED_MODIFIER,
+        swim_speed_modifier=config.DEFAULT_SWIM_SPEED_MODIFIER,
+        crouch_speed_modifier=config.DEFAULT_CROUCH_SPEED_MODIFIER,
+        sprint_speed_modifier=config.DEFAULT_SPRINT_SPEED_MODIFIER,
         *args,
         **kwargs,
     ):
@@ -342,24 +391,37 @@ class MovableSprite(Sprite):
 class CombatantSprite(LivingSprite):
     def __init__(
         self,
-        damage=DEFAULT_DAMAGE,
-        base_damage=DEFAULT_DAMAGE,
-        armor=DEFAULT_ARMOR,
-        base_armor=DEFAULT_ARMOR,
-        magic_resistance=DEFAULT_MAGIC_RESISTANCE,
-        base_magic_resistance=DEFAULT_MAGIC_RESISTANCE,
-        fire_resistance=DEFAULT_FIRE_RESISTANCE,
-        base_fire_resistance=DEFAULT_FIRE_RESISTANCE,
-        water_resistance=DEFAULT_WATER_RESISTANCE,
-        base_water_resistance=DEFAULT_WATER_RESISTANCE,
-        electricity_resistance=DEFAULT_ELECTRICITY_RESISTANCE,
-        base_electricity_resistance=DEFAULT_ELECTRICITY_RESISTANCE,
+        damage=config.DEFAULT_DAMAGE,
+        base_damage=config.DEFAULT_DAMAGE,
+        armor=config.DEFAULT_ARMOR,
+        base_armor=config.DEFAULT_ARMOR,
+        magic_resistance=config.DEFAULT_MAGIC_RESISTANCE,
+        base_magic_resistance=config.DEFAULT_MAGIC_RESISTANCE,
+        fire_resistance=config.DEFAULT_FIRE_RESISTANCE,
+        base_fire_resistance=config.DEFAULT_FIRE_RESISTANCE,
+        water_resistance=config.DEFAULT_WATER_RESISTANCE,
+        base_water_resistance=config.DEFAULT_WATER_RESISTANCE,
+        electricity_resistance=config.DEFAULT_ELECTRICITY_RESISTANCE,
+        base_electricity_resistance=config.DEFAULT_ELECTRICITY_RESISTANCE,
+        ice_resistance=config.DEFAULT_ICE_RESISTANCE,
+        base_ice_resistance=config.DEFAULT_ICE_RESISTANCE,
+        poison_resistance=config.DEFAULT_POISON_RESISTANCE,
+        base_poison_resistance=config.DEFAULT_POISON_RESISTANCE,
+        dark_resistance=config.DEFAULT_DARK_RESISTANCE,
+        base_dark_resistance=config.DEFAULT_DARK_RESISTANCE,
+        light_resistance=config.DEFAULT_LIGHT_RESISTANCE,
+        base_light_resistance=config.DEFAULT_LIGHT_RESISTANCE,
+        bleed_resistance=config.DEFAULT_BLEED_RESISTANCE,
+        base_bleed_resistance=config.DEFAULT_BLEED_RESISTANCE,
+        attack_cooldown=config.DEFAULT_ATTACK_COOLDOWN,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
+
         self.damage = damage
         self.base_damage = base_damage
+
         self.armor = armor
         self.base_armor = base_armor
         self.magic_resistance = magic_resistance
@@ -370,21 +432,161 @@ class CombatantSprite(LivingSprite):
         self.base_water_resistance = base_water_resistance
         self.electricity_resistance = electricity_resistance
         self.base_electricity_resistance = base_electricity_resistance
+        self.poison_resistance = poison_resistance
+        self.base_poison_resistance = base_poison_resistance
+        self.ice_resistance = ice_resistance
+        self.base_ice_resistance = base_ice_resistance
+        self.dark_resistance = dark_resistance
+        self.base_dark_resistance = base_dark_resistance
+        self.light_resistance = light_resistance
+        self.base_light_resistance = base_light_resistance
+        self.bleed_resistance = bleed_resistance
+        self.base_bleed_resistance = base_bleed_resistance
+
+        self.attack_cooldown = attack_cooldown
 
         self.draw_mult = 0
+        self.attack_cooldown_timer = 0.0
+        self.force_attack_cooldown = False
+        self.force_until_config = {}
+        self.is_attacking = False
+
+        self.kill_count = 0
+
+    def force_attack_cooldown_until(self, field1, operator1, field2, operator2, equals):
+        self.force_until_config = {
+            "f1": field1,
+            "op1": operator1,
+            "f2": field2,
+            "op2": operator2,
+            "eq": equals,
+        }
+        self.force_attack_cooldown = True
+
+    def toggle_force_attack_cooldown(self):
+        self.force_attack_cooldown = not self.force_attack_cooldown
+
+    def _check_forced_done(self):
+        if not (self.force_attack_cooldown or self.force_until_config):
+            return True
+        f1 = self.force_until_config.get("f1")
+        f2 = self.force_until_config.get("f2")
+        op1 = self.force_until_config.get("op1")
+        op2 = self.force_until_config.get("op2")
+        eq = self.force_until_config.get("eq")
+        f1v = getattr(self, f1, None)
+        f2v = getattr(self, f2, None)
+
+        try:
+            result = eval(f"{f1v} {op1} {f2v} {op2} {eq}")
+        except Exception as ex:
+            raise ex
+        else:
+            return result
+
+    def update(self, surface, camera=None, *args, **kwargs):
+        super().update(surface, camera)
+
+        if self.force_attack_cooldown and self._check_forced_done():
+            self.toggle_force_attack_cooldown()
+            self.attack_cooldown_timer = 0
+
+        if not self.force_attack_cooldown:
+            self.attack_cooldown_timer = max(
+                0.0,
+                self.attack_cooldown_timer - self.attack_cooldown,
+            )
 
     def attack(self, *others):
         results = {}
         for other in others:
-            r = getattr(self, "damage", 0) - getattr(other, "armor", 0)
-            # TODO: Implement resistances
-            results[other] = self.draw_mult if r == 0 else r > 0
-        return results
+            results[other] = other.defend(self)[self]
+            if not other or not other.alive():
+                self.kill_count += 1
+                self.experience += (
+                    calculate_experience_gain(self.experience) * 10
+                    if getattr(other, "is_boss")
+                    else 1
+                )
 
     def defend(self, *others):
         results = {}
         for other in others:
-            r = getattr(self, "armor", 0) - getattr(other, "damage", 0)
-            # TODO: Implement resistances
-            results[other] = self.draw_mult if r == 0 else r > 0
+            # TODO: Implmenet absorbing damage if the entity has a specific trait based on damage type
+            raw_damage = min(0, getattr(self, "armor", 0) - getattr(other, "damage", 0))
+            magic_damage = min(
+                0,
+                getattr(self, "magic_resistance", 0)
+                - getattr(other, "magic_damage", 0),
+            )
+            fire_damage = min(
+                0,
+                getattr(self, "fire_resistance", 0) - getattr(other, "fire_damage", 0),
+            )
+            water_damage = min(
+                0,
+                getattr(self, "water_resistance", 0)
+                - getattr(other, "water_damage", 0),
+            )
+            electricity_damage = min(
+                0,
+                getattr(self, "electricity_resistance", 0)
+                - getattr(other, "electricity_damage", 0),
+            )
+            dark_damage = min(
+                0,
+                getattr(self, "dark_resistance", 0) - getattr(other, "dark_damage", 0),
+            )
+            light_damage = min(
+                0,
+                getattr(self, "light_resistance", 0)
+                - getattr(other, "light_damage", 0),
+            )
+            ice_damage = min(
+                0,
+                getattr(self, "ice_resistance", 0) - getattr(other, "ice_damage", 0),
+            )
+            air_damage = min(
+                0,
+                getattr(self, "air_resistance", 0) - getattr(other, "air_damage", 0),
+            )
+
+            anti_synergies = {
+                ("dark", "light"): dark_damage - light_damage
+                if getattr(self, "dark_resistance", 0)
+                and getattr(other, "dark_damage", 0)
+                else light_damage,
+                ("fire", "water"): fire_damage - water_damage
+                if getattr(self, "fire_resistance", 0)
+                and getattr(other, "fire_damage", 0)
+                else water_damage,
+            }
+
+            synergies = {
+                ("electricity", "water"): water_damage * electricity_damage,
+                ("electricity", "air"): air_damage * electricity_damage,
+                ("fire", "ice"): ice_damage * fire_damage,
+                ("dark", "fire"): fire_damage * dark_damage,
+            }
+
+            # Find max damage potential from other based on own armor and resistances
+
+            damage_taken = max(
+                raw_damage,
+                magic_damage,
+                electricity_damage,
+                max(*list(anti_synergies.values())),
+                max(*list(synergies.values())),
+            )
+
+            self.health = max(
+                0,
+                self.health - damage_taken,
+            )
+            if damage_taken > 0:
+                blink_color = config.HEALTH_RED
+            else:
+                blink_color = pygame.Color("white")
+            self.blink(color=blink_color)
+            results[other] = damage_taken
         return results

@@ -4,8 +4,12 @@ import pygame
 from pygame.sprite import Group, Sprite
 from game import config
 
-from game.states.state import GameState
+from game.scenes.scene import Scene
 from game.utils import resource_path
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MenuSprite(Sprite):
@@ -37,12 +41,12 @@ class MenuButton(MenuText):
         text,
         font,
         color=pygame.Color("white"),
-        hover_color=pygame.Color("green"),
+        hover_color=config.STAMINA_GREEN,
         onclick=None,
         padding=(10, 5),
         border_color=pygame.Color("white"),
         border_width=2,
-        hover_border_color=pygame.Color("green"),
+        hover_border_color=config.STAMINA_GREEN,
         hover_border_width=2,
         hover_background_color=None,
         focus_color=pygame.Color("yellow"),
@@ -122,7 +126,7 @@ class MenuButton(MenuText):
         return button_image
 
 
-class MenuState(GameState):
+class MainMenuScene(Scene):
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
 
@@ -148,10 +152,6 @@ class MenuState(GameState):
         self.current_button_index = 0  # reset focused button
         self.create_menu_elements()
         return super().startup(current_time, persistant, surface)
-
-    def cleanup(self):
-        self.current_button_index = 0  # reset focused button
-        return super().cleanup()
 
     def create_menu_elements(self):
         heading_font = pygame.font.Font(self.font_file, self.heading_font_size)
@@ -236,12 +236,12 @@ class MenuState(GameState):
             button.onclick()
 
     def start_game(self):
-        print("Switching to GameplayState")
-        self.next_state = "GAME"
+        logger.debug("Switching to GameplayState")
+        self.next_scene = "GAME"
         self.done = True
 
     def load_game(self):
-        self.next_state = "GAME"
+        self.next_scene = "GAME"
         self.done = True
         self.game.load_game(config.SAVE_FILE, "GAME")
 
@@ -261,7 +261,7 @@ class MenuState(GameState):
             surface.blit(sprite.image, sprite.rect)
 
 
-class PauseState(MenuState):
+class PauseMenuScene(MainMenuScene):
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
         self.options = [
@@ -272,15 +272,24 @@ class PauseState(MenuState):
         self.heading_text = "Paused"
 
     def resume_game(self):
-        print("Switching to GameplayState")
-        self.next_state = "GAME"
+        logger.debug("Switching to GameplayState")
+        self.next_scene = "GAME"
         self.done = True
 
     def save_game(self):
-        self.next_state = "GAME"
+        self.next_scene = "GAME"
         self.done = True
         self.game.save_game(config.SAVE_FILE, "GAME")
 
     def quit_to_menu(self):
-        self.next_state = "MENU"
+        self.next_scene = "MENU"
         self.done = True
+
+    def get_event(self, event):
+        super().get_event(event)
+        if (
+            self.current_time - self.start_time > 1 / 1000
+            and event.type == pygame.KEYDOWN
+            and event.key == pygame.K_ESCAPE
+        ):
+            self.resume_game()

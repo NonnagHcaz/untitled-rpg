@@ -9,21 +9,16 @@ import pygame
 
 from game import utils
 
-from .state import GameState
+from .scene import Scene
 from .. import config
 
 
-class LoadState(GameState):
+class LoadingScene(Scene):
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
 
 
-class IntermediateState(LoadState):
-    def __init__(self, game, asset_cache):
-        super().__init__(game, asset_cache)
-
-
-class StartupState(LoadState):
+class StartupScene(LoadingScene):
     def __init__(self, game, asset_cache):
         super().__init__(game, asset_cache)
 
@@ -54,7 +49,7 @@ class StartupState(LoadState):
         self.wait = False
 
     def get_event(self, event):
-        """Get events from Control. Currently changes to next state on any key
+        """Get events from Control. Currently changes to next scene on any key
         press."""
         if event.type == pygame.KEYDOWN and self.wait:
             self.done = True
@@ -117,7 +112,7 @@ class StartupState(LoadState):
         loading_bar_rect = pygame.Rect(
             loading_bar_x, loading_bar_y, bar_width, loading_bar_height
         )
-        pygame.draw.rect(surface, pygame.Color("green"), loading_bar_rect)
+        pygame.draw.rect(surface, config.STAMINA_GREEN, loading_bar_rect)
 
         # Draw loading text
 

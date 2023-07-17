@@ -40,6 +40,6 @@ class Cursor(Sprite):
                 collisions.append(other)
         return collisions
 
-    def update(self):
+    def update(self, *args, **kwargs):
         self.pos = pygame.mouse.get_pos()
         self.rect.center = self.pos
