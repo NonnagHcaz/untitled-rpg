@@ -20,7 +20,7 @@ class Player(Entity):
     def interact_with_coords(self, x, y):
         pass
 
-    def diagnostics_pretty(self, cam=None):
+    def get_data_pretty(self, cam=None):
         n = self.name
         c = self.__class__
         r = self.rect

@@ -209,7 +209,7 @@ class GameplayScene(Scene):
             target=sprite,
             angle=-90,
             font_file=self.font,
-            text={"func": sprite.diagnostics_pretty, "args": [self.cam]},
+            text={"func": sprite.get_data_pretty, "args": [self.cam]},
             max_width=sprite.rect.width * 2,
         )
 
@@ -403,55 +403,16 @@ class GameplayScene(Scene):
         self.player = self.level.spawn_player()
         self.player.debug = self.debug
 
-        # height = 10
-        # offset = 5
-        # offsets = [offset * (i + 1) + height * i for i in range(3)]
-
-        # config = {
-        #     "target": self.player,
-        #     "width": self.player.rect.width * 2,
-        #     "secondary_color": pygame.Color("black"),
-        #     "border_color": pygame.Color("white"),
-        #     "border_width": 2,
-        # }
-
-        # health_config = {
-        #     "offset": offsets[0],
-        #     "primary_color": config.HEALTH_RED,
-        #     "current_attribute": "health",
-        #     "max_attribute": "base_health",
-        # }
-        # health_config.update(config)
-        # mana_config = {
-        #     "offset": offsets[1],
-        #     "primary_color": config.MANA_BLUE,
-        #     "current_attribute": "mana",
-        #     "max_attribute": "base_mana",
-        # }
-        # mana_config.update(config)
-        # stamina_config = {
-        #     "offset": offsets[2],
-        #     "primary_color": config.STAMINA_GREEN,
-        #     "current_attribute": "stamina",
-        #     "max_attribute": "base_stamina",
-        # }
-        # stamina_config.update(config)
-        # health_bar = TargetedStatusBar(font_file=self.font_file, **health_config)
-        # mana_bar = TargetedStatusBar(font_file=self.font_file, **mana_config)
-        # stamina_bar = TargetedStatusBar(font_file=self.font_file, **stamina_config)
 
         debug_textbox = TargetedTextBox(
             target=self.player,
             angle=-90,
             font_file=self.font,
-            text={"func": self.player.diagnostics_pretty, "args": [self.cam]},
+            text={"func": self.player.get_data_pretty, "args": [self.cam]},
             max_width=self.player.rect.width * 2,
         )
 
         self.player.debug_textbox = debug_textbox
-        # self.player.status_bars = [health_bar, mana_bar, stamina_bar]
-
-        # self.status_bars.add(health_bar, mana_bar, stamina_bar)
         self.texts.add(debug_textbox)
         self.player_sprites.add(
             self.player, debug_textbox  # , health_bar, mana_bar, stamina_bar

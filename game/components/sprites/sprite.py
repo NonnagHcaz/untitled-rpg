@@ -67,7 +67,7 @@ class Sprite(pygame.sprite.Sprite):
         self.blink_color = (255, 255, 255)
         self.blink_persist = False
 
-    def diagnostics_pretty(self, cam=None):
+    def get_data_pretty(self, cam=None):
         n = self.name
         c = self.__class__
         r = self.rect
@@ -101,14 +101,28 @@ class Sprite(pygame.sprite.Sprite):
         return [(l, t), (l + w, t), (l + w, t + h), (l, t + h)]
 
     @property
-    def diagnostics(self):
-        return {
-            "cls": self.__class__,
-            "name": self.name,
-            "rect": self.rect,
-            "dir": self.direction,
-            "debug": self.debug,
-        }
+    def data_attrs(self):
+        return [
+            "name",
+            "debug",
+            "experience",
+            "pos",
+            "direction",
+            "_layer",
+            "is_flipped",
+        ]
+
+    def get_data(self, *attrs):
+        if not len(attrs):
+            attrs = self.data_attrs
+        # Create a dictionary to store the relevant attributes
+        data = {"cls": self.__class__}
+
+        for attr in attrs:
+            try:
+                data[attr] = getattr(self, attr, None)
+            except:
+                pass
 
     @property
     def x(self):
