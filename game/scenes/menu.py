@@ -1,4 +1,5 @@
 import os
+import pickle
 from typing import Any
 import pygame
 from pygame.sprite import Group, Sprite
@@ -246,10 +247,13 @@ class MainMenuScene(Scene):
         self.next_scene = "GAME"
         self.done = True
 
-    def load_game(self):
-        self.next_scene = "GAME"
-        self.done = True
-        self.game.load_game(config.SAVE_FILE, "GAME")
+    def load_game(self, filename=config.SAVE_FILE):
+        with open(filename, "rb") as file:
+            game_state = pickle.load(file)
+        if not (self.persist and isinstance(self.persist, dict)):
+            self.persist = {}
+        self.persist["game_state"] = game_state
+        self.start_game()
 
     def goto_options(self):
         logger.debug("Switching to OptionMenuState")
