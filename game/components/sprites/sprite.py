@@ -363,6 +363,13 @@ class LivingSprite(Sprite):
         if regen_stamina:
             self.stamina = min(self.base_stamina, self.stamina + self.stamina_regen)
 
+    @property
+    def data_attrs(self):
+        this_attrs = []
+        for attr in ["health", "mana", "stamina"]:
+            this_attrs += [attr, f"base_{attr}", f"{attr}_regen", f"base_{attr}_regen"]
+        return super().data_attrs + this_attrs
+
 
 class MovableSprite(Sprite):
     def __init__(
@@ -389,6 +396,17 @@ class MovableSprite(Sprite):
         # self.walk_animation()
 
         self.update_speed()
+
+    @property
+    def data_attrs(self):
+        return (
+            super().data_attrs
+            + ["walk_speed"]
+            + [
+                f"{attr}_speed_modifier"
+                for attr in ["walk", "swim", "crouch", "sprint"]
+            ]
+        )
 
     def update_speed(self):
         self.speed = self.walk_speed * self.walk_speed_modifier
@@ -440,6 +458,7 @@ class CombatantSprite(LivingSprite):
         bleed_resistance=config.DEFAULT_BLEED_RESISTANCE,
         base_bleed_resistance=config.DEFAULT_BLEED_RESISTANCE,
         attack_cooldown=config.DEFAULT_ATTACK_COOLDOWN,
+        kill_count=0,
         *args,
         **kwargs,
     ):
@@ -470,6 +489,7 @@ class CombatantSprite(LivingSprite):
         self.base_bleed_resistance = base_bleed_resistance
 
         self.attack_cooldown = attack_cooldown
+        self.kill_count = kill_count
 
         self.draw_mult = 0
         self.attack_cooldown_timer = 0.0
@@ -477,7 +497,29 @@ class CombatantSprite(LivingSprite):
         self.force_until_config = {}
         self.is_attacking = False
 
-        self.kill_count = 0
+    @property
+    def data_attrs(self):
+        this_attrs = [
+            "damage",
+            "base_damage",
+            "armor",
+            "base_armor",
+            "attack_cooldown",
+            "kill_count",
+        ]
+        for attr in [
+            "magic",
+            "fire",
+            "water",
+            "electricity",
+            "posion",
+            "ice",
+            "dark",
+            "light",
+            "bleed",
+        ]:
+            this_attrs += [f"{attr}_resistance", f"base_{attr}_resistance"]
+        return super().data_attrs + this_attrs
 
     def force_attack_cooldown_until(self, field1, operator1, field2, operator2, equals):
         self.force_until_config = {
