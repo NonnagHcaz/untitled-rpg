@@ -312,15 +312,6 @@ class AssetCache(object):
 
         return font
 
-    def print(self, *keys):
-        if keys:
-            data = {}
-            for key in keys:
-                data[key] = self.cache[key]
-        else:
-            data = self.cache
-        pprint(data)
-
     def __getitem__(self, key):
         # Assume the correct
         try:

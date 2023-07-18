@@ -29,6 +29,7 @@ from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 import logging
 from game.components.sprites.text.textbox import TargetedTextBox
 from game.components.sprites.ui.status_bar import UIHealthBar, UIManaBar, UIStaminaBar
+from game.components.sprites.weapons.weapon import MagicOrb
 from game.level import Dungeon
 
 from game.scenes.scene import Scene
@@ -238,6 +239,7 @@ class GameplayScene(Scene):
             font_file=self.font_file,
             text={"func": sprite.get_data_pretty, "args": [self.cam]},
             max_width=sprite.rect.width * 2,
+            size=12,
         )
 
     def spawn_random_enemy(self):
@@ -368,7 +370,7 @@ class GameplayScene(Scene):
                 and getattr(self.player, "mana", config.DEFAULT_PLAYER_MANA) > 0.0
             ):
                 self.player.is_attacking = True
-                sprite = self.level.spawn_orb("orb", self.player, angle)
+                sprite = self.spawn_orb(self.player, self.player.rect.center, angle)
                 self.player_projectiles.add(sprite)
                 self.projectiles.add(sprite)
                 self.all_sprites.add(sprite)
@@ -440,6 +442,32 @@ class GameplayScene(Scene):
                 enemy.blink()
                 enemy.health -= projectile.damage
                 projectile.kill()
+
+    def spawn_orb(
+        self,
+        name,
+        pos,
+        angle,
+        color=None,
+        radius=4,
+        border_color=pygame.Color("black"),
+        border_width=1,
+    ):
+        name = "weapon_orb"
+
+        sprite = MagicOrb(
+            name=name,
+            angle=angle,
+            walk_speed=10,
+            damage=10,
+            pos=pos,
+            color=color,
+            radius=radius,
+            border_color=border_color,
+            border_width=border_width,
+        )
+
+        return sprite
 
     def spawn_animated_sprite(
         self,
