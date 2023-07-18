@@ -11,7 +11,7 @@ logging.basicConfig(filename="logs/debug.log", filemode="w", level=logging.DEBUG
 from game.game import Game
 from game import config
 
-__version__ = (0, 0, 3, "dev")
+__version__ = (0, 0, 3)
 
 config.CAPTION += f" v{'.'.join([str(x) for x in __version__])}"
 
