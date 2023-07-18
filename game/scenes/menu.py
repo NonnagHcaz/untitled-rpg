@@ -248,12 +248,15 @@ class MainMenuScene(Scene):
         self.done = True
 
     def load_game(self, filename=config.SAVE_FILE):
-        with open(filename, "rb") as file:
-            game_state = pickle.load(file)
-        if not (self.persist and isinstance(self.persist, dict)):
-            self.persist = {}
-        self.persist["game_state"] = game_state
-        self.start_game()
+        try:
+            with open(filename, "rb") as file:
+                game_state = pickle.load(file)
+            if not (self.persist and isinstance(self.persist, dict)):
+                self.persist = {}
+            self.persist["game_state"] = game_state
+            self.start_game()
+        except FileNotFoundError:
+            logger.warning("No save file found.")
 
     def goto_options(self):
         logger.debug("Switching to OptionMenuState")
