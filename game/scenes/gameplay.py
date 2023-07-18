@@ -282,7 +282,7 @@ class GameplayScene(Scene):
     def get_event(self, event):
         if event.type == pygame.QUIT:
             self.quit = True
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYUP:
             if (
                 event.key == pygame.K_ESCAPE
                 and self.current_time - self.start_time > 1 / 1000

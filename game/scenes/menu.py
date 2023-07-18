@@ -306,7 +306,7 @@ class PauseMenuScene(MainMenuScene):
         super().get_event(event)
         if (
             self.current_time - self.start_time > 1 / 1000
-            and event.type == pygame.KEYDOWN
+            and event.type == pygame.KEYUP
             and event.key == pygame.K_ESCAPE
         ):
             self.resume_game()
@@ -336,7 +336,7 @@ class OptionsMenuScene(MainMenuScene):
         super().get_event(event)
         if (
             self.current_time - self.start_time > 1 / 1000
-            and event.type == pygame.KEYDOWN
+            and event.type == pygame.KEYUP
             and event.key == pygame.K_ESCAPE
         ):
             self.goto_previous_scene()
