@@ -76,30 +76,25 @@ class Game(object):
 
         return largest_size
 
-    def save_game(self, filename, scene_name="GAME"):
-        scene = self.scene_dict.get(scene_name, self.current_scene)
+    def save_game(self, filename, next_scene="GAME"):
+        scene = self.scene_dict.get(next_scene, self.current_scene)
 
-        game_state = {
-            "player_position": (
-                scene.player.rect.x,
-                scene.player.rect.y,
-            ),
-            # Add more game state variables as needed
-        }
+        game_state = scene.game_state
         with open(filename, "wb") as file:
             pickle.dump(game_state, file)
         logger.info("Game saved.")
 
-    def load_game(self, filename):
+    def load_game(self, filename, next_scene="GAME"):
         try:
             with open(filename, "rb") as file:
                 game_state = pickle.load(file)
+            self.current_scene.persist["game_state"] = game_state
             # Update other game state variables as needed
             logger.info("Game loaded.")
         except FileNotFoundError:
             logger.warning("No save file found.")
 
-        self.current_scene.next_scene = "GAME"
+        self.current_scene.next_scene = next_scene
         self.flip_scene()
 
     def setup_scenes(self, scene_dict, start_scene):

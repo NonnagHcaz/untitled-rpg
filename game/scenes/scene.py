@@ -2,6 +2,8 @@
 
 import pygame
 
+from game.components.camera.camera import CameraAwareLayeredUpdates
+
 
 class Scene(object):
     """This is a prototype class for States.  All scenes should inherit from it.
@@ -29,6 +31,37 @@ class Scene(object):
         self.screen_rect = self.screen.get_rect()
         self.screen_size = self.screen_rect.size
         self.screen_width, self.screen_height = self.screen_size
+
+    def group_to_list(self, group):
+        data = []
+        for sprite in group:
+            try:
+                sprite_data = sprite.get_data()
+            except AttributeError as ex:
+                print(str(ex))
+            else:
+                data.append(sprite_data)
+        return data
+
+    @property
+    def game_state(self):
+        raw_game_state = self.game_groups
+        game_state = {}
+        for attr, val in raw_game_state.items():
+            if isinstance(val, pygame.sprite.Group) or isinstance(
+                val, CameraAwareLayeredUpdates
+            ):
+                game_state[attr] = self.group_to_list(val)
+            elif isinstance(val, pygame.sprite.Sprite):
+                try:
+                    game_state[attr] = val.get_data()
+                except AttributeError:
+                    pass
+        return game_state
+
+    @property
+    def game_groups(self):
+        return {}
 
     def get_event(self, event):
         """Processes events that were passed from the main event loop.
