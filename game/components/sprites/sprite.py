@@ -1,4 +1,5 @@
 import math
+import random
 import pygame
 from enum import Enum
 
@@ -43,25 +44,35 @@ class Sprite(pygame.sprite.Sprite):
         WEST = 3
 
     def __init__(
-        self, name=None, image=None, debug=False, experience=0, *groups, **kwargs
+        self,
+        name=None,
+        image=None,
+        debug=False,
+        experience=0,
+        _layer=0,
+        pos=(0, 0),
+        is_flipped=False,
+        direction=Direction.EAST,
+        *groups,
+        **kwargs,
     ):
         super().__init__(*groups)
 
         self.experience = experience
-        self.image = image
-        self._image = image
         self.debug = debug
         self.name = name
-        self.direction = None
-        self.rect = None
-        self.is_flipped = False
-        self.pos = (None, None)
-        self._layer = 0
+        self.direction = direction
+        self.is_flipped = is_flipped
+        self.pos = pos
+        self._layer = _layer
+
+        self.image = image
         if not self.image:
             self.rect = pygame.Rect((0, 0, 0, 0))
         else:
             self.rect = self.image.get_rect()
-        self._image = self.image
+        self.rect.center = self.pos
+        self.original_image = self.image
 
         self.blink_timer = 0
         self.blink_color = (255, 255, 255)
@@ -123,6 +134,7 @@ class Sprite(pygame.sprite.Sprite):
                 data[attr] = getattr(self, attr, None)
             except:
                 pass
+        return data
 
     @property
     def x(self):
