@@ -18,8 +18,11 @@ from pygame.locals import (
 
 from game.components.camera.camera import Camera, CameraAwareLayeredUpdates
 from game.components.sprites.cursor.cursor import Cursor
+from game.components.sprites.entities.enemies.enemy import Enemy
+from game.components.sprites.entities.player import Player
 
 from game.components.sprites.shape.shape import Hitbox
+from game.components.sprites.sprite import Sprite
 from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 
 
@@ -57,20 +60,27 @@ class GameplayScene(Scene):
         self.walls = None
         self.floors = None
         self.all_sprites = None
+
         self.debug = True
-        self.zoom = 1
-        self.font_file = resource_path("assets/fonts/PixeloidSans.ttf")
+        self.zoom = 1  # TODO: Pickle
 
     def startup(self, current_time, persistent, surface):
         super().startup(current_time, persistent, surface)
         pygame.mouse.set_visible(False)
         pygame.time.set_timer(ADDENEMY, config.DEFAULT_ENEMY_SPAWN_TIMER)
+
+        if not (self.persist and isinstance(self.persist, dict)):
+            self.persist = {}
+        game_state = self.persist.get("game_state", {}) or {}
+        self.setup_game_state(game_state)
+
+    def setup_game_state(self, game_state={}):
         # pygame.mixer.music.load(self.bgm)
         # pygame.mixer.music.play(-1)
         self.cam = Camera()
 
-        self.bgm = None
-        self.font = None
+        self.bgm_file = None
+        self.font_file = config.FONT_FILE
 
         self.controls = Controls()
 
@@ -83,7 +93,7 @@ class GameplayScene(Scene):
         self.projectiles.add(self.player_projectiles, self.enemy_projectiles)
         self.hitboxes = pygame.sprite.Group()
         self.status_bars = pygame.sprite.Group()
-        self.texts = pygame.sprite.Group()
+        self.debug_textboxes = pygame.sprite.Group()
 
         level_width = 16 * 250
         level_height = 9 * 250
@@ -94,13 +104,41 @@ class GameplayScene(Scene):
             display_width=self.screen.get_rect().width,
             display_height=self.screen.get_rect().height,
             cache=self.asset_cache,
+        )  # TODO: Pickle
+
+        self.max_enemies = self.level.width // 100
+
+        self.floor = self.level.build_test_floor()  # TODO: Pickle
+        self.walls = self.level.build_test_walls()  # TODO: Pickle
+
+        self.respawn_player(game_state.get("player", {}))
+
+        self.setup_ui()
+
+        enemy_datas = game_state.get("enemies", [])
+        if enemy_datas:
+            self.setup_enemies(*enemy_datas)
+        else:
+            self.setup_test_enemies()
+
+        self.all_sprites = CameraAwareLayeredUpdates(
+            target=self.player,
+            world_size=pygame.Rect(0, 0, level_width, level_height),
+            cam=self.cam,
         )
 
-        self.floor = self.level.build_test_floor()
-        self.walls = self.level.build_test_walls()
+        self.all_sprites.add(self.floor, layer=-1)
+        self.all_sprites.add(self.walls, layer=1)
+        self.all_sprites.add(self.enemies, layer=2)
+        # self.all_sprites.add(self.hitboxes, layer=3)
+        self.all_sprites.add(self.status_bars, layer=3)
+        self.all_sprites.add(self.debug_textboxes, layer=3)
+        self.all_sprites.add(self.player_sprites)
+        for group in [self.player_sprites]:
+            for sprite in group:
+                self.all_sprites.move_to_front(sprite)
 
-        self.respawn()
-
+    def setup_ui(self):
         self.cursor = Cursor(
             name="cursor",
             image=self.asset_cache[
@@ -115,6 +153,7 @@ class GameplayScene(Scene):
         #     max_width=self.cursor.rect.width * 2,
         # )
         # self.cursor.text = cursor_text
+        self.mp_line = pygame.sprite.Sprite()
 
         ui_bar_offset = 10
 
@@ -160,40 +199,27 @@ class GameplayScene(Scene):
 
         self.ui_sprites.add(self.cursor, ui_healthbar, ui_manabar, ui_staminabar)
 
-        self.mp_line = pygame.sprite.Sprite()
-        self.max_enemies = self.level.width // 100
+    @property
+    def game_groups(self):
+        return {
+            "player": self.player,
+            "enemies": self.enemies,
+            "walls": self.walls,
+            "floor": self.floor,
+        }
+
+    def setup_enemies(self, *enemy_datas):
+        for enemy_data in enemy_datas:
+            print(enemy_data)
+            sprite = self.spawn_animated_sprite(enemy_data, True, True)
+            self.enemies.add(sprite)
+
+    def setup_test_enemies(self):
         while len(self.enemies) < self.max_enemies:
-            sprite = self.spawn_random_enemy()
+            self.spawn_random_enemy()
 
-        self.all_sprites = CameraAwareLayeredUpdates(
-            target=self.player,
-            world_size=pygame.Rect(0, 0, level_width, level_height),
-            cam=self.cam,
-        )
-
-        self.all_sprites.add(self.floor, layer=-1)
-        self.all_sprites.add(self.walls, layer=1)
-        self.all_sprites.add(self.enemies, layer=2)
-        # self.all_sprites.add(self.hitboxes, layer=3)
-        self.all_sprites.add(self.status_bars, layer=3)
-        self.all_sprites.add(self.texts, layer=3)
-        self.all_sprites.add(self.player_sprites)
-        for group in [self.player_sprites]:
-            for sprite in group:
-                self.all_sprites.move_to_front(sprite)
-
-    def spawn_random_enemy(self):
-        perc = 0.2
-        x = random.randint(
-            int(self.level.width * perc), int(self.level.width * (1.0 - perc))
-        )
-        y = random.randint(
-            int(self.level.height * perc), int(self.level.height * (1.0 - perc))
-        )
-        sprite = self.level.spawn_random_enemy(pos=(x, y))
-        sprite.debug = self.debug
-
-        status_bar = TargetedStatusBar(
+    def get_sprite_health_bar(self, sprite):
+        return TargetedStatusBar(
             font_file=self.font_file,
             target=sprite,
             offset=5,
@@ -205,24 +231,39 @@ class GameplayScene(Scene):
             max_attribute="base_health",
         )
 
-        debug_textbox = TargetedTextBox(
+    def get_sprite_debug_textbox(self, sprite):
+        return TargetedTextBox(
             target=sprite,
             angle=-90,
-            font_file=self.font,
+            font_file=self.font_file,
             text={"func": sprite.get_data_pretty, "args": [self.cam]},
             max_width=sprite.rect.width * 2,
         )
 
-        sprite.status_bars = [status_bar]
-        sprite.debug_textbox = debug_textbox
+    def spawn_random_enemy(self):
+        perc = 0.2
+        x = random.randint(
+            int(self.level.width * perc), int(self.level.width * (1.0 - perc))
+        )
+        y = random.randint(
+            int(self.level.height * perc), int(self.level.height * (1.0 - perc))
+        )
 
+        dual_anim = config.SPRITESHEETS["0x72d2"]["enemies"]["dual_anim"]
+        bosses = config.SPRITESHEETS["0x72d2"]["enemies"]["bosses"]
+
+        if random.random() < 0.05:
+            choices = bosses
+        else:
+            choices = dual_anim
+
+        name = random.choice(choices)
+
+        sprite_data = {"name": name, "pos": (x, y), "cls": Enemy}
+
+        sprite = self.spawn_animated_sprite(sprite_data=sprite_data)
         self.enemies.add(sprite)
-        # self.hitboxes.add(Hitbox(target=sprite))
-        self.status_bars.add(status_bar)
-        self.texts.add(debug_textbox)
-        if self.all_sprites:
-            self.all_sprites.add(status_bar, debug_textbox, sprite)
-        logger.debug(f"Spawned {sprite.name} at {sprite.pos}")
+
         return sprite
 
     def cleanup(self):
@@ -230,6 +271,10 @@ class GameplayScene(Scene):
         # pygame.mixer.music.stop()
         pygame.time.set_timer(ADDENEMY, 0)
         pygame.mouse.set_visible(True)
+        if not (self.persist and isinstance(self.persist, dict)):
+            self.persist = {}
+
+        self.persist["game_state"] = self.game_state
         return super().cleanup()
 
     def get_event(self, event):
@@ -246,7 +291,7 @@ class GameplayScene(Scene):
             if event.key == pygame.K_k:
                 self.player.kill()
             elif event.key == pygame.K_r:
-                self.respawn()
+                self.respawn_player()
             elif event.key == pygame.K_p:
                 self.possess()
         elif event.type == ADDENEMY:
@@ -396,47 +441,83 @@ class GameplayScene(Scene):
                 enemy.health -= projectile.damage
                 projectile.kill()
 
-    def respawn(self):
+    def spawn_animated_sprite(
+        self,
+        sprite_data,
+        has_health_bar=True,
+        has_debug_textbox=True,
+    ):
+        name = sprite_data["name"]
+        idle_frames = [
+            self.asset_cache[
+                (config.SPRITESHEETS["0x72d2"]["filepath"], f"{name}_idle_anim_f{x}")
+            ]
+            for x in range(0, 4)
+        ]
+        walk_frames = [
+            self.asset_cache[
+                (config.SPRITESHEETS["0x72d2"]["filepath"], f"{name}_run_anim_f{x}")
+            ]
+            for x in range(0, 4)
+        ]
+        sprite_data.update(
+            {
+                "image": idle_frames[0],
+                "idle_frames": idle_frames,
+                "walk_frames": walk_frames,
+            }
+        )
+
+        sprite_class = sprite_data.get("cls", Sprite)
+        sprite = sprite_class(**sprite_data)
+
+        if has_health_bar:
+            health_bar = self.get_sprite_health_bar(sprite)
+            sprite.health_bar = health_bar
+            self.status_bars.add(health_bar)
+
+        if has_debug_textbox:
+            debug_textbox = self.get_sprite_debug_textbox(sprite)
+            sprite.debug_textbox = debug_textbox
+            self.debug_textboxes.add(debug_textbox)
+
+        return sprite
+
+    def respawn_player(self, player_data={}):
         for sprite in self.player_sprites:
             sprite.kill()
 
-        self.player = self.level.spawn_player()
-        self.player.debug = self.debug
+        if not player_data:
+            player_data = {
+                "name": "wizzard_m",
+                "pos": (self.screen_width // 2, self.screen_height // 2),
+                "debug": self.debug,
+                "cls": Player,
+            }
 
+        self.player = self.spawn_animated_sprite(player_data, False, True)
 
-        debug_textbox = TargetedTextBox(
-            target=self.player,
-            angle=-90,
-            font_file=self.font,
-            text={"func": self.player.get_data_pretty, "args": [self.cam]},
-            max_width=self.player.rect.width * 2,
-        )
-
-        self.player.debug_textbox = debug_textbox
-        self.texts.add(debug_textbox)
         self.player_sprites.add(
-            self.player, debug_textbox  # , health_bar, mana_bar, stamina_bar
+            self.player,
+            self.player.debug_textbox,  # , health_bar, mana_bar, stamina_bar
         )
 
-        try:
+        if self.all_sprites:
             self.all_sprites.add(self.player_sprites)
-        except Exception as ex:
-            logger.warning(
-                f"Couldn't add {self.player_sprites} to all_sprites: {str(ex)}"
-            )
-
-        try:
             self.all_sprites.set_target(self.player)
-        except Exception as ex:
-            logger.warning(f"Couldn't set {self.player} as camera target: {str(ex)}")
 
     def possess(self):
+        if not self.player:
+            return False
         try:
             self.real_player = self.player.copy()
             self.player = random.choice([x for x in self.enemies])
             self.all_sprites.target = self.player
         except IndexError:
             logger.warning("No more sprites to possess")
+            return False
+        else:
+            return True
 
     def update(self, surface, current_time, dt):
         super().update(surface, current_time)
