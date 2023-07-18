@@ -211,7 +211,6 @@ class GameplayScene(Scene):
 
     def setup_enemies(self, *enemy_datas):
         for enemy_data in enemy_datas:
-            print(enemy_data)
             sprite = self.spawn_animated_sprite(enemy_data, True, True)
             self.enemies.add(sprite)
 
