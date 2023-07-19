@@ -5,9 +5,11 @@ The splash screen of the game. The first thing the user sees.
 import glob
 import os
 import re
+import time
 import pygame
 
 from game import utils
+from game.utils.asset_cache import _fn
 
 from .scene import Scene
 from .. import config
@@ -51,6 +53,8 @@ class StartupScene(LoadingScene):
             for filepath in utils.get_filepaths(config.MUSIC_DIR, *config.SOUND_ACCEPTS)
         ]
 
+        self.asset_generator = (x for x in self.assets)
+
         self.mappers = utils.get_filepaths(config.GFX_DIR, ".txt")
 
         self.total_assets = len(self.assets)
@@ -65,12 +69,12 @@ class StartupScene(LoadingScene):
             self.done = True
 
     def handle_events(self):
-        if self.loaded_assets >= len(self.assets):
+        if self.is_done_loading:
             self.wait = True
 
     @property
     def is_done_loading(self):
-        return self.loaded_assets >= len(self.assets)
+        return self.loaded_assets >= self.total_assets
 
     def update(self, surface, current_time, dt):
         super().update(surface, current_time)
@@ -79,34 +83,34 @@ class StartupScene(LoadingScene):
         if self.is_done_loading:
             self.loading_text = f"Loading done! Press any key to continue..."
         else:
-            for asset in self.assets:
-                asset_type = asset[0]
-                if asset_type == "image":
-                    filename = asset[1]
-                    mapper = re.sub(
-                        "|".join([x for x in config.IMAGE_ACCEPTS]), ".txt", filename
-                    )
-                    if mapper not in self.mappers:
-                        mapper = None
-                    image = self.asset_cache.load_image(filename, mapper)
-                    if isinstance(image, list):
-                        _x = len(image) - 1
-                        self.total_assets += _x
-                        self.loaded_assets += _x
-                elif asset_type == "font":
-                    filename = asset[1]
-                    size = asset[2]
-                    self.asset_cache.load_font(filename, font_size=size)
-                elif asset_type == "sound":
-                    filename = asset[1]
-                    self.asset_cache.load_sound(filename)
-                # Add more asset types as needed
-
-                # Update the loaded assets count
-                self.loaded_assets += 1
-                self.loading_text = (
-                    f"Loading... {self.loaded_assets}/{self.total_assets}"
+            asset = next(self.asset_generator)
+            asset_type = asset[0]
+            if asset_type == "image":
+                filename = asset[1]
+                mapper = re.sub(
+                    "|".join([x for x in config.IMAGE_ACCEPTS]), ".txt", filename
                 )
+                if mapper not in self.mappers:
+                    mapper = None
+                image = self.asset_cache.load_image(filename, mapper)
+
+                if isinstance(image, list):
+                    _x = len(image) - 1
+                    self.total_assets += _x
+                    self.loaded_assets += _x
+            elif asset_type == "font":
+                filename = asset[1]
+                size = asset[2]
+                self.asset_cache.load_font(filename, font_size=size)
+            elif asset_type == "sound":
+                filename = asset[1]
+                self.asset_cache.load_sound(filename)
+            # Add more asset types as needed
+
+            # Update the loaded assets count
+            self.loaded_assets += 1
+            self.loading_text = f"Loading... {self.loaded_assets}/{self.total_assets}"
+
         self.render(surface)
 
     def render(self, surface):
