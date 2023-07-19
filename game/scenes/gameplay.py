@@ -143,7 +143,7 @@ class GameplayScene(Scene):
         self.cursor = Cursor(
             name="cursor",
             image=self.asset_cache[
-                _fn(os.path.join(config.GFX_DIR, "crosshair_1.png"))
+                "image", _fn(os.path.join(config.GFX_DIR, "crosshair_1.png"))
             ],
             cam=self.cam,
         )
@@ -477,13 +477,21 @@ class GameplayScene(Scene):
         name = sprite_data["name"]
         idle_frames = [
             self.asset_cache[
-                (config.SPRITESHEETS["0x72d2"]["filepath"], f"{name}_idle_anim_f{x}")
+                (
+                    "image",
+                    config.SPRITESHEETS["0x72d2"]["filepath"],
+                    f"{name}_idle_anim_f{x}",
+                )
             ]
             for x in range(0, 4)
         ]
         walk_frames = [
             self.asset_cache[
-                (config.SPRITESHEETS["0x72d2"]["filepath"], f"{name}_run_anim_f{x}")
+                (
+                    "image",
+                    config.SPRITESHEETS["0x72d2"]["filepath"],
+                    f"{name}_run_anim_f{x}",
+                )
             ]
             for x in range(0, 4)
         ]

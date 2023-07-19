@@ -214,7 +214,7 @@ class AssetCache(object):
         if scale_factor:
             image = pygame.transform.smoothscale_by(image, scale_factor)
 
-        _name = name
+        _name = ("image", name[0], name[1], scale_factor, flip_x, flip_y)
         if _name not in self.cache or overwrite:
             self.cache[_name] = image
 
@@ -258,8 +258,9 @@ class AssetCache(object):
 
         sfx = pygame.mixer.Sound(filepath)
         _name = _fn(filepath)
+        _name = ("sound", _name[0], _name[1])
         if _name not in self.cache or overwrite:
-            self.cache[_fn(filepath)] = sfx
+            self.cache[_name] = sfx
 
         return sfx
 
@@ -307,56 +308,122 @@ class AssetCache(object):
 
         font = pygame.font.Font(filepath, font_size)
         _name = _fn(filepath)
+        _name = ("font", _name[0], _name[1], font_size)
         if _name not in self.cache or overwrite:
-            self.cache[_fn(filepath)] = font
+            self.cache[_name] = font
 
         return font
 
+    def validate_asset_type(self, test_type):
+        kind = test_type.lower()
+        if kind in ["image", "img", "sheet", "spritesheet", "sprite"]:
+            return "image"
+        elif kind in ["font"]:
+            return "font"
+        elif kind in ["sfx"]:
+            return "sfx"
+        elif kind in ["music", "bgm"]:
+            return "music"
+        elif kind in ["text", "txt", "mapping"]:
+            return "txt"
+        return None
+
     def __getitem__(self, key):
-        # Assume the correct
-        try:
-            return self.cache[key]
-        except KeyError:
-            if isinstance(key, str):
-                key = _fn(key)
-            elif (isinstance(key, list) or isinstance(key, tuple)) and len(key) == 1:
-                key = _fn(key[0])
+        if isinstance(key, str):
+            key = (str(self._derive_type(key)).lower(), key)
+        elif isinstance(key, tuple):
+            key_type = self.validate_asset_type(key[0])
+            if not key_type:
+                key = (str(self._derive_type(key[0])).lower(),) + key
+        else:
+            raise f"{type(key)} not acceptable key type for AssetCache.__getitem__(key)"
 
-            filepath, name = key
+        if len(key) < 2:
+            raise f"{key} not acceptable key value for AssetCache.__getitem__(key)"
 
-            if len(key) == 3:
+        kind = key[0]
+
+        if len(key) == 2 and isinstance(key[1], tuple):
+            key = (kind,) + key[1]
+
+        if len(key) == 2:
+            # Assume the filepath to a loose image/frame/fontfile
+            this_file, this_name = _fn(key[1])
+        else:
+            # Assume filepath and name, no modifier
+            this_file, this_name = key[1], key[2]
+
+        if kind == "image":
+            image_scale_factor = 1.0
+            image_flip_x = False
+            image_flip_y = False
+
+            if len(key) >= 4:
+                image_scale_factor = key[3]
+
+            if len(key) >= 5:
+                image_flip_x = key[4]
+                image_flip_y = image_flip_x
+
+            if len(key) >= 6:
+                image_flip_y = key[5]
+
+            key = (
+                kind,
+                this_file,
+                this_name,
+                image_scale_factor,
+                image_flip_x,
+                image_flip_y,
+            )
+
+        elif kind == "font":
+            font_size = 24
+            if len(key) >= 4:
                 try:
-                    _k2 = int(key[2])
+                    _k2 = int(key[3])
                 except ValueError:
                     font_size = 24
                 else:
                     font_size = _k2
-            else:
-                font_size = 24
-
-            _type = self._derive_type(filepath)
+            key = (kind, this_file, this_name, font_size)
+        try:
+            return self.cache[key]
+        except KeyError:
+            _type = key[0]
             if _type == "image":
                 try:
-                    tile = self.map[key]
+                    self.map[(this_file, this_name)]
                 except TypeError:
                     logger.error(f"Missing {key} from Mapper")
                     return None
                 except KeyError:
                     logger.error(f"Missing 'sheet' Mapper entry for {key}")
+                sheet = self.cache[("image",) + _fn(key[1]) + (1.0, False, False)]
 
-                sheet = self.cache[_fn(key[0])]
+                image = self.strip_name_from_sheet(sheet, (this_file, this_name))
+                if image_flip_x or image_flip_y:
+                    image = pygame.transform.flip(
+                        image, flip_x=image_flip_x, flip_y=image_flip_y
+                    )
 
-                image = self.strip_name_from_sheet(sheet, key)
+                if image_scale_factor != 1.0:
+                    image = pygame.transform.smoothscale_by(image, image_scale_factor)
                 self.cache[key] = image
                 return image
             elif _type == "sound":
-                sound = self.load_sound(filepath)
+                sound = self.load_sound(this_file)
                 self.cache[key] = sound
                 return sound
+            elif _type == "sfx":
+                sfx = self.load_sfx(this_file)
+                self.cache[key] = sfx
+                return sfx
             elif _type == "font":
-                font = self.load_font(filepath, font_size=font_size)
+                font = self.load_font(this_file, font_size=font_size)
                 self.cache[key] = font
                 return font
+        return None
 
     def strip_from_sheet(self, sheet, start, size, columns, rows=1):
         """Strips individual frames from a sprite sheet given a start location,
