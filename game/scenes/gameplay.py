@@ -104,7 +104,7 @@ class GameplayScene(Scene):
             height=level_height,
             display_width=self.screen.get_rect().width,
             display_height=self.screen.get_rect().height,
-            cache=self.asset_cache,
+            asset_cache=self.asset_cache,
         )  # TODO: Pickle
 
         self.max_enemies = self.level.width // 100

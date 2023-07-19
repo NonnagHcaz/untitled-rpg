@@ -92,8 +92,8 @@ class XLargeRoom(Room):
 
 
 class Level(object):
-    def __init__(self, width, height, display_width, display_height, cache):
-        self.cache = cache
+    def __init__(self, width, height, display_width, display_height, asset_cache):
+        self.asset_cache = asset_cache
 
         self.width = width
         self.height = height
@@ -118,7 +118,9 @@ class Level(object):
         tiles = []
 
         floor_frames = [
-            self.cache[(config.SPRITESHEETS["0x72d2"]["filepath"], f"floor_{x}")]
+            self.asset_cache[
+                ("image", config.SPRITESHEETS["0x72d2"]["filepath"], f"floor_{x}")
+            ]
             for x in range(1, 9)
         ]
         _t0 = floor_frames[0].get_rect()
@@ -136,7 +138,9 @@ class Level(object):
         for x in range(0, self.width, _tw):
             y = self.height - _th * 1.5
             name = "edge_down"
-            image = self.cache[(config.SPRITESHEETS["0x72d2"]["filepath"], name)]
+            image = self.asset_cache[
+                ("image", config.SPRITESHEETS["0x72d2"]["filepath"], name)
+            ]
             sprite = Sprite(name=name, image=image)
             sprite.spawn(pos=(x, y))
             tiles.append(sprite)
@@ -154,8 +158,8 @@ class Level(object):
         _gw, _gh = self.width, self.height
         _gw50, _gh50 = _gw // 2, _gh // 2
 
-        _t0 = self.cache[
-            (config.SPRITESHEETS["0x72d2"]["filepath"], "wall_edge_top_left")
+        _t0 = self.asset_cache[
+            ("image", config.SPRITESHEETS["0x72d2"]["filepath"], "wall_edge_top_left")
         ].get_rect()
         _tw, _th = _t0.width, _t0.height
         _bx, _by = _gw // _tw, _gh // _th
@@ -186,8 +190,8 @@ class Level(object):
                 else:
                     name = None
                 if name:
-                    image = self.cache[
-                        (config.SPRITESHEETS["0x72d2"]["filepath"], name)
+                    image = self.asset_cache[
+                        ("image", config.SPRITESHEETS["0x72d2"]["filepath"], name)
                     ]
                     sprite = Sprite(name=name, image=image)
                     sprite.spawn(pos=(x, y))
