@@ -137,10 +137,10 @@ class MainMenuScene(Scene):
         )
 
         self.options = [
-            ("Start Game", self.start_game),
-            ("Load Game", self.load_game),
+            ("Start New Game", self.start_new_game),
+            ("Load Saved Game", self.load_game),
             ("Options", self.goto_options),
-            ("Exit", self.exit_game),
+            ("Exit to Desktop", self.exit_game),
         ]
         self.heading_text = config.CAPTION
         self.button_padding = (10, 5)
@@ -241,6 +241,10 @@ class MainMenuScene(Scene):
         if self.buttons.sprites():
             button = self.buttons.sprites()[self.current_button_index]
             button.onclick()
+
+    def start_new_game(self):
+        self.persist = {}
+        self.start_game()
 
     def start_game(self):
         logger.debug("Switching to GameplayState")
