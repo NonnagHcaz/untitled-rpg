@@ -53,6 +53,7 @@ class MenuButton(MenuText):
         focus_color=pygame.Color("yellow"),
         focus_border_color=pygame.Color("yellow"),
         focus_border_width=2,
+        args=(),
         *groups,
     ):
         super().__init__(text, font, color, *groups)
@@ -71,20 +72,21 @@ class MenuButton(MenuText):
         self.text = text
         self.font = font
         self.color = color
+        self.args = args
 
     def update(self, *args, **kwargs):
-        if self.is_focused:
-            self.image = self._render_button(
-                self.focus_color,
-                self.focus_border_color,
-                self.focus_border_width,
-                self.hover_background_color,
-            )
-        elif self.is_hovered:
+        if self.is_hovered:
             self.image = self._render_button(
                 self.hover_color,
                 self.hover_border_color,
                 self.hover_border_width,
+                self.hover_background_color,
+            )
+        elif self.is_focused:
+            self.image = self._render_button(
+                self.focus_color,
+                self.focus_border_color,
+                self.focus_border_width,
                 self.hover_background_color,
             )
         else:
@@ -156,9 +158,9 @@ class MainMenuScene(Scene):
         self.buttons = Group()
 
     def startup(self, current_time, persistant, surface):
+        super().startup(current_time, persistant, surface)
         self.current_button_index = 0  # reset focused button
         self.create_menu_elements()
-        return super().startup(current_time, persistant, surface)
 
     def create_menu_elements(self):
         heading_font = pygame.font.Font(self.font_file, self.heading_font_size)
@@ -211,7 +213,7 @@ class MainMenuScene(Scene):
     def handle_click(self, pos):
         for button in self.buttons.sprites():
             if button.rect.collidepoint(pos):
-                button.onclick()
+                button.onclick(*button.args)
 
     def handle_keydown(self, key):
         if key == pygame.K_UP:
