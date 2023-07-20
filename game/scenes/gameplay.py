@@ -28,7 +28,12 @@ from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 
 import logging
 from game.components.sprites.text.textbox import TargetedTextBox
-from game.components.sprites.ui.status_bar import UIHealthBar, UIManaBar, UIStaminaBar
+from game.components.sprites.ui.status_bar import (
+    UIExperienceBar,
+    UIHealthBar,
+    UIManaBar,
+    UIStaminaBar,
+)
 from game.components.sprites.weapons.weapon import MagicOrb
 from game.level import Dungeon
 
@@ -156,49 +161,73 @@ class GameplayScene(Scene):
         # self.cursor.text = cursor_text
         self.mp_line = pygame.sprite.Sprite()
 
+        ui_border_width = 30
+
         ui_bar_offset = 10
+        ui_bar_height = self.screen_height * 0.1
 
         ui_healthbar = UIHealthBar(
-            width=min(self.screen_width * 0.3, 500),
-            height=30,
+            width=self.screen_width * 0.3,
+            height=ui_bar_height * 0.65,
             target=self.player,
             offset=0,
             current_attribute="health",
             max_attribute="base_health",
         )
-        ui_healthbar.rect.topleft = (ui_bar_offset, ui_bar_offset)
+        ui_healthbar.rect.topleft = (ui_border_width, ui_border_width)
 
         ui_manabar = UIManaBar(
-            width=min(
-                self.screen_width * 0.2 - ui_bar_offset / 2, 300 - ui_bar_offset / 2
-            ),
-            height=30,
+            width=self.screen_width * 0.2 - ui_bar_offset / 2,
+            height=ui_bar_height * 0.5,
             target=self.player,
             offset=0,
             current_attribute="mana",
             max_attribute="base_mana",
         )
         ui_manabar.rect.topleft = (
-            ui_bar_offset,
-            ui_bar_offset + ui_healthbar.height + ui_bar_offset,
+            ui_border_width,
+            ui_border_width + ui_healthbar.height + ui_bar_offset,
         )
 
         ui_staminabar = UIStaminaBar(
-            width=min(
-                self.screen_width * 0.1 - ui_bar_offset / 2, 200 - ui_bar_offset / 2
-            ),
-            height=30,
+            width=self.screen_width * 0.1 - ui_bar_offset / 2,
+            height=ui_bar_height * 0.5,
             target=self.player,
             offset=0,
             current_attribute="stamina",
             max_attribute="base_stamina",
         )
         ui_staminabar.rect.topleft = (
-            ui_bar_offset + ui_manabar.width + ui_bar_offset,
-            ui_bar_offset + ui_healthbar.height + ui_bar_offset,
+            ui_border_width + ui_manabar.width + ui_bar_offset,
+            ui_border_width + ui_healthbar.height + ui_bar_offset,
         )
 
-        self.ui_sprites.add(self.cursor, ui_healthbar, ui_manabar, ui_staminabar)
+        ui_experience_bar = UIExperienceBar(
+            width=self.screen_width * 0.3,
+            height=ui_bar_height * 0.5,
+            target=self.player,
+            offset=0,
+            current_attribute="experience",
+            max_attribute="until_next_level",
+        )
+
+        ui_experience_bar.rect.topleft = (
+            ui_border_width,
+            ui_border_width
+            + ui_healthbar.height
+            + ui_bar_offset
+            + ui_manabar.height
+            + ui_bar_offset,
+        )
+
+
+        self.ui_sprites.add(
+            self.cursor,
+            ui_healthbar,
+            ui_manabar,
+            ui_staminabar,
+            ui_experience_bar,
+        )
 
     @property
     def game_groups(self):
