@@ -1,18 +1,48 @@
 import logging
 
 from game.components.sprites.entities.entity import Entity
+from game.components.sprites.ui.hotbar import Hotbar
 
 logger = logging.getLogger(__name__)
-from game import config
-import pygame
+
+
+class Inventory:
+    def __init__(self, capacity=10):
+        self.capacity = capacity
+        self.items = []
+
+    def add_item(self, item):
+        if len(self.items) < self.capacity:
+            self.items.append(item)
+            return True
+        else:
+            return False
+
+    def remove_item(self, item):
+        if item in self.items:
+            self.items.remove(item)
+            return True
+        else:
+            return False
+
+    def get_item_count(self, item):
+        return self.items.count(item)
+
+    def get_all_items(self):
+        return self.items[:]
 
 
 class Player(Entity):
     is_player = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self, weapon=None, armor=None, inventory=None, hotbar=None, *args, **kwargs
+    ):
         super().__init__(*args, **kwargs)
-        self.weapon = None
+        self.weapon = weapon
+        self.armor = armor
+        self.inventory = inventory or Inventory()
+        self.hotbar = hotbar or Hotbar
 
     def interact(self, other):
         pass
