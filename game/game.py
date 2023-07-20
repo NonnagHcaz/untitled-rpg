@@ -10,7 +10,7 @@ from pygame.locals import K_RALT, K_RETURN, VIDEOEXPOSE, VIDEORESIZE, RESIZABLE
 import pickle
 import logging
 from game import config
-from game.components.console.console import Console, get_console_config
+from game.utils.console import Console, get_console_config
 
 from game.utils.asset_cache import AssetCache
 from game.utils.controls import Controls

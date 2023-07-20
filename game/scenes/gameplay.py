@@ -38,9 +38,7 @@ from game.components.sprites.weapons.weapon import MagicOrb
 from game.level import Dungeon
 
 from game.scenes.scene import Scene
-from game.utils import resource_path
 from game.utils.asset_cache import _fn
-from game.utils.controls import Controls
 from game.utils.events import ADDENEMY
 
 logger = logging.getLogger(__name__)
