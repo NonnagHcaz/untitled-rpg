@@ -1,7 +1,6 @@
 import logging
 
 from game.components.sprites.entities.entity import Entity
-from game.components.sprites.ui.hotbar import Hotbar
 
 logger = logging.getLogger(__name__)
 
@@ -35,14 +34,11 @@ class Inventory:
 class Player(Entity):
     is_player = True
 
-    def __init__(
-        self, weapon=None, armor=None, inventory=None, hotbar=None, *args, **kwargs
-    ):
+    def __init__(self, weapon=None, armor=None, inventory=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.weapon = weapon
         self.armor = armor
         self.inventory = inventory or Inventory()
-        self.hotbar = hotbar or Hotbar
 
     def interact(self, other):
         pass
