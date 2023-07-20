@@ -1,6 +1,7 @@
 import pygame
 
 from game.components.sprites.status_bar.status_bar import (
+    ExperienceBar,
     HealthBar,
     StaminaBar,
     ManaBar,
@@ -26,4 +27,8 @@ class UIStaminaBar(UIStatusBar, StaminaBar):
 
 
 class UIManaBar(UIStatusBar, ManaBar):
+    pass
+
+
+class UIExperienceBar(UIStatusBar, ExperienceBar):
     pass

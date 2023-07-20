@@ -93,6 +93,7 @@ class TargetedStatusBar(StatusBar):
     def update(self, *args, **kwargs):
         if not self.target.alive():
             self.kill()
+
         _c = getattr(self.target, self.current_attribute, 1)
         _m = getattr(self.target, self.max_attribute, 1)
         p = _c / _m
@@ -130,5 +131,14 @@ class ManaBar(TargetedStatusBar):
         super().__init__(*args, **kwargs)
         self.border_color = pygame.Color("white")
         self.primary_color = config.MANA_BLUE
+        self.secondary_color = pygame.Color("black")
+        self.border_width = 2
+
+
+class ExperienceBar(TargetedStatusBar):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.border_color = pygame.Color("white")
+        self.primary_color = config.GREEDY_GOLD
         self.secondary_color = pygame.Color("black")
         self.border_width = 2
