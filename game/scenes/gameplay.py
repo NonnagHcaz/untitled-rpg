@@ -88,7 +88,7 @@ class GameplayScene(Scene):
         self.bgm_file = None
         self.font_file = config.FONT_FILE
 
-        self.controls = Controls()
+        self.controls = self.game.controls
 
         self.ui_sprites = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
@@ -219,7 +219,6 @@ class GameplayScene(Scene):
             + ui_manabar.height
             + ui_bar_offset,
         )
-
 
         self.ui_sprites.add(
             self.cursor,

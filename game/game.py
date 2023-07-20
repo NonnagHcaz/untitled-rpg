@@ -10,8 +10,10 @@ from pygame.locals import K_RALT, K_RETURN, VIDEOEXPOSE, VIDEORESIZE, RESIZABLE
 import pickle
 import logging
 from game import config
+from game.components.console.console import Console, get_console_config
 
 from game.utils.asset_cache import AssetCache
+from game.utils.controls import Controls
 
 
 logger = logging.getLogger(__name__)
@@ -27,7 +29,9 @@ class Game(object):
     and its run method serves as the "game loop".
     """
 
-    def __init__(self, screen_size=None, caption=config.CAPTION, fps=config.FRAMERATE):
+    def __init__(
+        self, screen_size=(1280, 720), caption=config.CAPTION, fps=config.FRAMERATE
+    ):
         pygame.init()
 
         if screen_size is None:
@@ -60,6 +64,12 @@ class Game(object):
         self.next_scene = None
 
         self.asset_cache = AssetCache()
+        self.controls = Controls()
+        # Generate random console config (no parameter) or specify the layout by nums 1 to 6
+        console_config = get_console_config(6)
+
+        # Create console based on the config - feel free to implement custom code to read the config directly from json
+        self.console = Console(self, self.screen.get_width(), console_config)
 
     def get_largest_display(self):
         # Get the user's screen size
@@ -108,7 +118,9 @@ class Game(object):
     def event_loop(self):
         """Process all events and pass them down to current State.  The f5 key
         globally turns on/off the display of FPS in the caption"""
-        for event in pygame.event.get():
+        self.events = pygame.event.get()
+
+        for event in self.events:
             if event.type == pygame.QUIT:
                 self.done = True
                 break
@@ -121,6 +133,11 @@ class Game(object):
                 r0 = self.screen.copy().get_rect()
                 self.screen = pygame.display.get_surface()
                 r1 = self.screen.copy().get_rect()
+            elif event.type == pygame.KEYUP:
+                # Toggle console on/off the console
+                if event.key == pygame.K_BACKQUOTE:
+                    # Toggle the console - if on then off if off then on
+                    self.console.toggle()
 
             self.current_scene.get_event(event)
 
@@ -152,6 +169,7 @@ class Game(object):
 
         dt: milliseconds since last frame
         """
+
         self.screen.fill((0, 0, 0))
         self.current_time = pygame.time.get_ticks()
         self.keys = pygame.key.get_pressed()
@@ -165,6 +183,10 @@ class Game(object):
             fps = self.clock.get_fps()
             with_fps = f"{self.caption} - {fps:.2f} FPS - {self.current_scene.zoom*100:.0f}% Zoom"
             pygame.display.set_caption(with_fps)
+            self.console.update(self.events)
+
+            # Display the console if enabled or animation is still in progress
+            self.console.show(self.screen)
 
     def toggle_show_fps(self, key):
         """Press f5 to turn on/off displaying the framerate in the caption."""

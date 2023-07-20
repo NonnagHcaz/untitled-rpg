@@ -41,6 +41,7 @@
 """
 
 from io import StringIO
+import os
 from random import (
     randint,
 )  # for redirection of commands output to the graphical console
@@ -48,7 +49,11 @@ import sys  # for redirection of stdout to the graphical console
 import pygame  # for Surface and graphics init
 import pygame.freetype  # for all the fonts
 import pygame.locals as pl  # for key names
-import cmd  # for command line support https://docs.python.org/3/library/cmd.html
+import cmd
+
+from game import (
+    config,
+)  # for command line support https://docs.python.org/3/library/cmd.html
 
 
 class Padding(tuple):
@@ -1759,7 +1764,7 @@ def get_console_config(sample=None):
                 "text_params": ["cons_get_pos", "cons_get_time"],
                 "layout": ["SCROLL_LEFT_CONTINUOUS", 0, 2],
                 "padding": (10, 10, 10, 10),
-                "font_file": "assets/font/roboto/Roboto-Regular.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "font_size": 12,
                 "font_antialias": True,
                 "font_color": (255, 255, 255),
@@ -1771,7 +1776,7 @@ def get_console_config(sample=None):
             },
             "output": {
                 "padding": (10, 10, 10, 10),
-                "font_file": "assets/font/roboto/Roboto-Black.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "font_size": 16,
                 "font_antialias": True,
                 "font_color": (255, 255, 255),
@@ -1785,7 +1790,7 @@ def get_console_config(sample=None):
             },
             "input": {
                 "padding": (10, 10, 10, 10),
-                "font_file": "assets/font/roboto/Roboto-Black.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "font_size": 16,
                 "font_antialias": True,
                 "font_color": (255, 0, 0),
@@ -1802,7 +1807,7 @@ def get_console_config(sample=None):
                 "text_params": ["cons_get_input_spacing"],
                 "layout": ["SCROLL_RIGHT_CONTINUOUS", 100, 1],
                 "padding": (10, 10, 10, 10),
-                "font_file": "assets/font/roboto/Roboto-Regular.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "font_size": 10,
                 "font_antialias": True,
                 "font_color": (255, 255, 255),
@@ -1830,7 +1835,7 @@ def get_console_config(sample=None):
             },
             "output": {
                 "padding": (10, 10, 10, 10),
-                "font_file": "assets/font/roboto/Roboto-Black.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "font_size": 16,
                 "font_antialias": True,
                 "font_color": (255, 255, 255),
@@ -1844,7 +1849,7 @@ def get_console_config(sample=None):
             },
             "input": {
                 "padding": (10, 10, 10, 10),
-                "font_file": "assets/font/roboto/Roboto-Black.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "font_size": 16,
                 "font_antialias": True,
                 "font_color": (255, 0, 0),
@@ -1862,7 +1867,7 @@ def get_console_config(sample=None):
     if sample == 3:
         return {
             "header": {
-                "font_file": "assets/font/roboto/Roboto-Regular.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "text": "Sample 3: Minimal - only header. Current Time: {} ",
                 "text_params": ["cons_get_time"],
                 "layout": ["SCROLL_LEFT_CONTINUOUS", 0, 2],
@@ -1873,7 +1878,7 @@ def get_console_config(sample=None):
     if sample == 4:
         return {
             "header": {
-                "font_file": "assets/font/roboto/Roboto-Regular.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "text": "Sample 4: Minimal - only header and footer. Current Position: {} ",
                 "text_params": ["cons_get_pos"],
                 "layout": ["SCROLL_LEFT_CONTINUOUS", 0, 2],
@@ -1881,7 +1886,7 @@ def get_console_config(sample=None):
             "footer": {
                 "text": "Sample 4: Minimal - only header and footer ",
                 "layout": ["SCROLL_RIGHT_CONTINUOUS", 100, 1],
-                "font_file": "assets/font/roboto/Roboto-Regular.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
             },
         }
 
@@ -1889,12 +1894,12 @@ def get_console_config(sample=None):
     if sample == 5:
         return {
             "header": {
-                "font_file": "assets/font/roboto/Roboto-Regular.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "text": "Sample 5: Minimal - only header and input, output on stdout. Current Pos: {} ",
                 "text_params": ["cons_get_pos"],
                 "layout": ["TEXT_CENTRE"],
             },
-            "input": {"font_file": "assets/font/roboto/Roboto-Black.ttf"},
+            "input": {"font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf")},
         }
 
     # Sample 6: Mimimal - only input and output, with transparency and welcome msg
@@ -1908,11 +1913,11 @@ def get_console_config(sample=None):
                 "welcome_msg_color": (0, 255, 0),
             },
             "input": {
-                "font_file": "assets/font/roboto/Roboto-Black.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "bck_alpha": 0,
             },
             "output": {
-                "font_file": "assets/font/roboto/Roboto-Black.ttf",
+                "font_file": os.path.join(config.FONT_DIR, "PixeloidSans.ttf"),
                 "bck_alpha": 0,
                 "display_lines": 20,
                 "display_columns": 100,
