@@ -425,12 +425,13 @@ class GameplayScene(Scene):
             self.player, self.enemy_projectiles, dokill=False
         )
 
-        for enemy in player_enemies:
-            self.player.blink()
-            self.player.health -= enemy.damage
+        self.player.defend(*player_enemies)
+        # for enemy in player_enemies:
+        #     self.player.blink()
+        #     self.player.health -= enemy.damage
+
         for projectile in player_enemy_projectile_collisions:
-            self.player.blink()
-            self.player.health -= projectile.damage
+            self.player.defend(projectile)
             projectile.kill()
 
         for enemy in self.enemies:
@@ -438,8 +439,7 @@ class GameplayScene(Scene):
                 enemy, self.projectiles, dokill=False
             )
             for projectile in enemy_projectile_collisions:
-                enemy.blink()
-                enemy.health -= projectile.damage
+                self.player.attack(enemy)
                 projectile.kill()
 
     def spawn_orb(
@@ -528,6 +528,7 @@ class GameplayScene(Scene):
                 "pos": (self.screen_width // 2, self.screen_height // 2),
                 "debug": self.debug,
                 "cls": Player,
+                "magic_damage": 10,
             }
 
         self.player = self.spawn_animated_sprite(player_data, False, True)

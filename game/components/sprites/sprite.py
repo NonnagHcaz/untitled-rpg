@@ -437,8 +437,8 @@ class CombatantSprite(LivingSprite):
         self,
         damage=config.DEFAULT_DAMAGE,
         base_damage=config.DEFAULT_DAMAGE,
-        armor=config.DEFAULT_ARMOR,
-        base_armor=config.DEFAULT_ARMOR,
+        blunt_resistance=config.DEFAULT_BLUNT_RESISTANCE,
+        base_blunt_resistance=config.DEFAULT_BLUNT_RESISTANCE,
         magic_resistance=config.DEFAULT_MAGIC_RESISTANCE,
         base_magic_resistance=config.DEFAULT_MAGIC_RESISTANCE,
         fire_resistance=config.DEFAULT_FIRE_RESISTANCE,
@@ -467,8 +467,8 @@ class CombatantSprite(LivingSprite):
         self.damage = damage
         self.base_damage = base_damage
 
-        self.armor = armor
-        self.base_armor = base_armor
+        self.blunt_resistance = blunt_resistance
+        self.base_blunt_resistance = base_blunt_resistance
         self.magic_resistance = magic_resistance
         self.base_magic_resistance = base_magic_resistance
         self.fire_resistance = fire_resistance
@@ -502,8 +502,8 @@ class CombatantSprite(LivingSprite):
         this_attrs = [
             "damage",
             "base_damage",
-            "armor",
-            "base_armor",
+            "blunt_resistance",
+            "base_blunt_resistance",
             "attack_cooldown",
             "kill_count",
         ]
@@ -569,54 +569,68 @@ class CombatantSprite(LivingSprite):
         results = {}
         for other in others:
             results[other] = other.defend(self)[self]
-            if not other or not other.alive():
+
+            if not other or not other.alive() or getattr(other, "health", 1) <= 0:
                 self.kill_count += 1
-                self.experience += (
-                    calculate_experience_gain(self.experience) * 10
-                    if getattr(other, "is_boss")
-                    else 1
-                )
+                exp = calculate_experience_gain(self.experience)
+                self.experience += exp * 10 if getattr(other, "is_boss", False) else exp
+        return results
 
     def defend(self, *others):
         results = {}
         for other in others:
             # TODO: Implmenet absorbing damage if the entity has a specific trait based on damage type
-            raw_damage = min(0, getattr(self, "armor", 0) - getattr(other, "damage", 0))
-            magic_damage = min(
+            raw_damage = max(
+                0, getattr(other, "damage", 0) - getattr(self, "blunt_resistance", 0)
+            )
+            magic_damage = max(
                 0,
-                getattr(self, "magic_resistance", 0)
-                - getattr(other, "magic_damage", 0),
+                getattr(other, "magic_damage", 0)
+                - getattr(self, "magic_resistance", 0),
+            )
+
+            fire_damage = max(
+                0,
+                getattr(other, "fire_damage", 0) - getattr(self, "fire_resistance", 0),
+            )
+
+            water_damage = max(
+                0,
+                getattr(other, "water_damage", 0)
+                - getattr(self, "water_resistance", 0),
             )
             fire_damage = min(
                 0,
-                getattr(self, "fire_resistance", 0) - getattr(other, "fire_damage", 0),
+                getattr(self, "fire_resistance", 0)
+                - max(
+                    0,
+                    getattr(other, "fire_damage", 0),
+                ),
             )
-            water_damage = min(
+            electricity_damage = max(
                 0,
-                getattr(self, "water_resistance", 0)
-                - getattr(other, "water_damage", 0),
+                getattr(other, "electricity_damage", 0)
+                - getattr(self, "electricity_resistance", 0),
             )
-            electricity_damage = min(
+            dark_damage = max(
                 0,
-                getattr(self, "electricity_resistance", 0)
-                - getattr(other, "electricity_damage", 0),
+                getattr(other, "dark_damage", 0) - getattr(self, "dark_resistance", 0),
             )
-            dark_damage = min(
+            light_damage = max(
                 0,
-                getattr(self, "dark_resistance", 0) - getattr(other, "dark_damage", 0),
+                getattr(other, "light_damage", 0)
+                - getattr(self, "light_resistance", 0),
             )
-            light_damage = min(
-                0,
-                getattr(self, "light_resistance", 0)
-                - getattr(other, "light_damage", 0),
+            ice_damage = max(
+                0, getattr(other, "ice_damage", 0) - getattr(self, "ice_resistance", 0)
             )
-            ice_damage = min(
-                0,
-                getattr(self, "ice_resistance", 0) - getattr(other, "ice_damage", 0),
+            air_damage = max(
+                0, getattr(other, "air_damage", 0) - getattr(self, "air_resistance", 0)
             )
-            air_damage = min(
+            poison_damage = max(
                 0,
-                getattr(self, "air_resistance", 0) - getattr(other, "air_damage", 0),
+                getattr(other, "poison_damage", 0)
+                - getattr(self, "poison_resistance", 0),
             )
 
             anti_synergies = {
@@ -635,9 +649,10 @@ class CombatantSprite(LivingSprite):
                 ("electricity", "air"): air_damage * electricity_damage,
                 ("fire", "ice"): ice_damage * fire_damage,
                 ("dark", "fire"): fire_damage * dark_damage,
+                ("poison", "dark"): poison_damage * dark_damage,
             }
 
-            # Find max damage potential from other based on own armor and resistances
+            # Find max damage potential from other based on own blunt_resistance and resistances
 
             damage_taken = max(
                 raw_damage,
@@ -656,5 +671,5 @@ class CombatantSprite(LivingSprite):
             else:
                 blink_color = pygame.Color("white")
             self.blink(color=blink_color)
-            results[other] = damage_taken
+            results[other] = self.health
         return results
