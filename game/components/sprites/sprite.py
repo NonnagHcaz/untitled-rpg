@@ -45,8 +45,8 @@ class Sprite(pygame.sprite.Sprite):
 
     def __init__(
         self,
-        name=None,
-        image=None,
+        name,
+        image,
         debug=False,
         experience=0,
         _layer=0,

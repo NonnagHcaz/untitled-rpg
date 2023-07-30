@@ -170,7 +170,7 @@ class Game(object):
         dt: milliseconds since last frame
         """
 
-        self.screen.fill((0, 0, 0))
+        self.screen.fill((0, 0, 0, 0))
         self.current_time = pygame.time.get_ticks()
         self.keys = pygame.key.get_pressed()
         if self.current_scene.quit:

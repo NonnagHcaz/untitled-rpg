@@ -279,7 +279,7 @@ class MainMenuScene(Scene):
         self.render(surface)
 
     def render(self, surface):
-        surface.fill((0, 0, 0))
+        # surface.fill((0, 0, 0))
 
         for sprite in self.all_sprites:
             surface.blit(sprite.image, sprite.rect)

@@ -18,7 +18,6 @@ class Shape(Sprite):
         *args,
         **kwargs,
     ):
-        super().__init__(*args, **kwargs)
         self.width = width
         self.height = height or width
         self.primary_color = primary_color
@@ -28,8 +27,10 @@ class Shape(Sprite):
         self.border_width = border_width
         self.alpha = alpha
 
-        self.image = pygame.Surface((self.width, self.height), self.alpha)
-        self.rect = self.image.get_rect()
+        image = pygame.Surface((self.width, self.height), self.alpha)
+        kwargs["image"] = kwargs.get("image", image)
+        kwargs["name"] = kwargs.get("name", "shape")
+        super().__init__(*args, **kwargs)
 
     def draw(self):
         super().draw()
