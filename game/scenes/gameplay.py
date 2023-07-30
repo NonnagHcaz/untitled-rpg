@@ -444,29 +444,14 @@ class GameplayScene(Scene):
                 self.player.is_idle = True
 
     def check_collisions(self):
-        player_enemies = pygame.sprite.spritecollide(
-            self.player, self.enemies, dokill=False
-        )
-        player_enemy_projectile_collisions = pygame.sprite.spritecollide(
-            self.player, self.enemy_projectiles, dokill=False
-        )
-
-        self.player.defend(*player_enemies)
-        # for enemy in player_enemies:
-        #     self.player.blink()
-        #     self.player.health -= enemy.damage
-
-        for projectile in player_enemy_projectile_collisions:
-            self.player.defend(projectile)
-            projectile.kill()
-
         for enemy in self.enemies:
-            enemy_projectile_collisions = pygame.sprite.spritecollide(
-                enemy, self.projectiles, dokill=False
-            )
-            for projectile in enemy_projectile_collisions:
-                self.player.attack(enemy)
-                projectile.kill()
+            for projectile in self.projectiles:
+                if pygame.sprite.collide_mask(projectile, enemy):
+                    self.player.attack(enemy)
+                    projectile.kill()
+
+            if pygame.sprite.collide_mask(self.player, enemy):
+                self.player.defend(enemy)
 
     def spawn_orb(
         self,
@@ -592,7 +577,7 @@ class GameplayScene(Scene):
         self.ui_sprites.update(surface)
 
         self.all_sprites.update(fake_surface)
-        fake_surface.fill(pygame.Color("black"))
+        # fake_surface.fill(pygame.Color("black"))
         self.all_sprites.draw(fake_surface)
 
         # fake_surface.blit(self.cursor.image, self.cursor.rect)

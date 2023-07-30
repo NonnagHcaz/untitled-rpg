@@ -67,10 +67,8 @@ class Sprite(pygame.sprite.Sprite):
         self._layer = _layer
 
         self.image = image
-        if not self.image:
-            self.rect = pygame.Rect((0, 0, 0, 0))
-        else:
-            self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
         self.rect.center = self.pos
         self.original_image = self.image
 
@@ -179,8 +177,6 @@ class Sprite(pygame.sprite.Sprite):
 
     def draw(self):
         if self.blink_timer or self.blink_persist:
-            if not hasattr(self, "original_image"):
-                self.original_image = self.image
             if self.blink_timer % BLINK_MOD:
                 self.image = self.original_image
             else:
@@ -190,13 +186,13 @@ class Sprite(pygame.sprite.Sprite):
             if not self.blink_timer:
                 if self.blink_persist:
                     self.blink_timer = BLINK_MOD
-                else:
-                    delattr(self, "original_image")
 
         if self.debug:
             self.draw_hitbox()
 
     def blink(self, duration=1, color=(255, 0, 0), persist=False):
+        self.original_image = self.image
+        self.original_mask = self.mask
         self.blink_color = color
         self.blink_timer = duration * BLINK_MOD
         self.blink_persist = persist
@@ -206,15 +202,13 @@ class Sprite(pygame.sprite.Sprite):
     def unblink(self):
         self.blink_timer = 0
         self.blink_persist = False
-        try:
-            delattr(self, "original_image")
-        except AttributeError:
-            pass
+        self.image = self.original_image
+        self.mask = self.original_mask
 
         return True
 
     def check_collision(self, other):
-        return pygame.sprite.collide_rect(self.rect, other.rect)
+        return pygame.sprite.collide_mask(self, other)
 
     def check_collisions(self, others):
         return [self.check_collision(other) for other in others]
@@ -239,6 +233,7 @@ class MergedSprite(Sprite):
         self.sprites += others
         self.image = MergedSprite.merge(self.sprites)
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         return self.image
 
     @staticmethod
@@ -262,6 +257,8 @@ class AnimatedSprite(Sprite):
         super().__init__(*args, **kwargs)
         self.idle_frames = idle_frames
         self.walk_frames = walk_frames
+        self.idle_masks = [pygame.mask.from_surface(x) for x in self.idle_frames]
+        self.walk_masks = [pygame.mask.from_surface(x) for x in self.walk_frames]
         self.black_frames = black_frames
         self._direction = self.direction
 
@@ -276,11 +273,14 @@ class AnimatedSprite(Sprite):
             if self.is_idle:
                 self.counter = (self.counter + 1) % len(self.idle_frames)
                 frame = self.idle_frames[self.counter]
+                mask = self.idle_masks[self.counter]
             else:
                 self.counter = (self.counter + 1) % len(self.walk_frames)
                 frame = self.walk_frames[self.counter]
+                mask = self.walk_masks[self.counter]
 
             self.image = frame
+            self.mask = mask
 
             if not self.is_flipped and self.direction == self.Direction.WEST:
                 self.flip()
@@ -305,8 +305,6 @@ class AnimatedSprite(Sprite):
     def update(self, surface, camera=None, *args, **kwargs):
         super().update(surface, camera)
         next(self.animation)
-        if self.debug:
-            self.draw_hitbox()
 
 
 class LivingSprite(Sprite):
