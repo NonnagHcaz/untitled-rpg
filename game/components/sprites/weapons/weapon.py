@@ -55,21 +55,26 @@ class Dagger(BladedWeapon):
         super().__init__(*args, **kwargs)
 
 
-class Wand(MagicWeapon):
+class MagicWand(RangedWeapon, MagicWeapon):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class MagicStaff(RangedWeapon, BluntWeapon, MagicWeapon):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 
 class Projectile(CombatantSprite, MovableSprite):
-    def __init__(self, angle, *args, **kwargs):
+    def __init__(self, degrees, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.angle = math.radians(angle)  # Convert angle to radians
+        self.degrees = degrees % 360.0
+        self.radians = math.radians(self.degrees)  # Convert angle to radians
 
     def update(self, *args, **kwargs):
-        super().update(*args, **kwargs)
-        _x = self.speed * math.cos(self.angle)
-        _y = -self.speed * math.sin(self.angle)
-        self.rect.move_ip(_x, _y)
+        _vx = self.speed * math.cos(self.radians)
+        _vy = -self.speed * math.sin(self.radians)
+        self.rect.move_ip((_vx, _vy))
 
         self.health -= 1
         if self.health <= 0:
@@ -85,7 +90,7 @@ class MagicOrb(Projectile):
     def __init__(
         self,
         color=None,
-        radius=4,
+        radius=8,
         border_color=pygame.Color("black"),
         border_width=1,
         *args,

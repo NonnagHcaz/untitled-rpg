@@ -34,7 +34,7 @@ from game.components.sprites.ui.status_bar import (
     UIManaBar,
     UIStaminaBar,
 )
-from game.components.sprites.weapons.weapon import MagicOrb
+from game.components.sprites.weapons.weapon import MagicOrb, MagicStaff
 from game.level import Dungeon
 
 from game.scenes.scene import Scene
@@ -375,10 +375,10 @@ class GameplayScene(Scene):
 
         self.zoom = self.cam.zoom_level
         start_vector = pygame.Vector2(self.player.pos) + self.cam
-        end_vector = self.cursor.pos
+        end_vector = pygame.Vector2(self.cursor.pos)
         dx = end_vector[0] - start_vector[0]
         dy = end_vector[1] - start_vector[1]
-        angle = math.degrees(math.atan2(-dy, dx)) % 360
+        angle = math.degrees(math.atan2(-dy, dx)) % 360.0
 
         if start_vector[0] < end_vector[0]:
             self.player.direction = self.player.Direction.EAST
@@ -400,8 +400,11 @@ class GameplayScene(Scene):
                 self.projectiles.add(sprite)
                 self.all_sprites.add(sprite)
                 self.all_sprites.move_to_front(sprite)
-                self.player.attack_cooldown_timer += getattr(
-                    self.player, "attack_cooldown", config.DEFAULT_ATTACK_COOLDOWN
+                self.player.attack_cooldown_timer += (
+                    getattr(
+                        self.player, "attack_cooldown", config.DEFAULT_ATTACK_COOLDOWN
+                    )
+                    * 10
                 )
                 self.player.mana = max(
                     0,
@@ -433,8 +436,7 @@ class GameplayScene(Scene):
             )
             _w, _h = self.level.size
             if r[0] > 0 and r[1] > 0 and r[0] + r[2] < _w and r[1] + r[3] < _h:
-                self.player.move((r.x, r.y))
-                self.player.pos = self.player.rect.center
+                self.player.move(r.topleft)
                 logger.info(f"{self.player.name} moved to {self.player.rect.midbottom}")
             else:
                 logger.warning(f"{self.player.name} OOB")
@@ -467,7 +469,7 @@ class GameplayScene(Scene):
 
         sprite = MagicOrb(
             name=name,
-            angle=angle,
+            degrees=angle,
             walk_speed=10,
             damage=10,
             pos=pos,
@@ -607,6 +609,6 @@ class GameplayScene(Scene):
         pygame.draw.line(
             surface,
             config.HEALTH_RED,
-            pygame.Vector2(self.player.pos) + self.cam,
-            self.cursor.pos,
+            pygame.Vector2(self.player.rect.center) + self.cam,
+            pygame.Vector2(self.cursor.rect.center),
         )

@@ -69,7 +69,8 @@ class Sprite(pygame.sprite.Sprite):
         self.image = image
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
-        self.rect.center = self.pos
+
+        self.rect.topleft = self.pos
         self.original_image = self.image
 
         self.blink_timer = 0
@@ -142,13 +143,15 @@ class Sprite(pygame.sprite.Sprite):
     def y(self):
         return self.pos[1]
 
-    def spawn(self, pos, layer=0, direction=Direction.SOUTH, angle=0, flipped=False):
+    def spawn(
+        self, pos, layer=0, direction=Direction.SOUTH, rotation=0.0, flipped=False
+    ):
         self.direction = direction
         self._layer = layer
         if flipped:
             self.flip()
-        if angle % 360:
-            self.rotate(angle)
+        if rotation % 360.0:
+            self.rotate(rotation)
         self.pos = pos
         self.rect.topleft = self.pos
 
@@ -173,9 +176,9 @@ class Sprite(pygame.sprite.Sprite):
         pygame.draw.rect(self.image, config.HEALTH_RED, self.rect, 3)
 
     def update(self, *args, **kwargs):
-        self.draw()
+        self.draw(*args, **kwargs)
 
-    def draw(self):
+    def draw(self, *args, **kwargs):
         if self.blink_timer or self.blink_persist:
             if self.blink_timer % BLINK_MOD:
                 self.image = self.original_image
@@ -221,8 +224,8 @@ class Sprite(pygame.sprite.Sprite):
 
 
 class MergedSprite(Sprite):
-    def __init__(self, sprites=[], *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, sprites=[], *groups, **kwargs):
+        super().__init__(*groups, **kwargs)
         self.sprites = sprites
 
         self.append([])
@@ -426,8 +429,7 @@ class MovableSprite(Sprite):
     def move(self, pos, *args, **kwargs):
         self.pos = pos
         # self.rect = self.image.get_rect()
-        self.rect.x = self.pos[0]
-        self.rect.y = self.pos[1]
+        self.rect.topleft = self.pos
 
 
 class CombatantSprite(LivingSprite):

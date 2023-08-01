@@ -1,9 +1,7 @@
 import random
-from ..entity import Entity
+import pygame
 
-import logging
-
-logger = logging.getLogger(__name__)
+from game.components.sprites.entities.entity import Entity
 
 
 class Enemy(Entity):
@@ -33,33 +31,10 @@ class Enemy(Entity):
             self.mingle_timer = max(0, self.mingle_timer - 1)
 
 
-class Zombie(Enemy):
-    is_undead = True
-
-    def __init__(self, kind=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.kind = kind
 
 
-class Goblin(Enemy):
-    def __init__(self, kind=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.kind = kind
 
 
-class Orc(Enemy):
-    def __init__(self, kind=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.kind = kind
 
 
-class Ogre(Enemy):
-    def __init__(self, kind=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.kind = kind
 
-
-class Demon(Enemy):
-    def __init__(self, kind=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.kind = kind
