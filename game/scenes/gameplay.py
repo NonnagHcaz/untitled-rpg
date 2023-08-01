@@ -602,7 +602,7 @@ class GameplayScene(Scene):
         # self.cursor.text.update()
         self.ui_sprites.update(surface)
 
-        self.all_sprites.update(fake_surface)
+        self.all_sprites.update(fake_surface, player=self.player, camera=self.cam)
         # fake_surface.fill(pygame.Color("black"))
         self.all_sprites.draw(fake_surface)
 
