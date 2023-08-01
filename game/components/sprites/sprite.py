@@ -459,6 +459,7 @@ class CombatantSprite(LivingSprite):
         base_bleed_resistance=config.DEFAULT_BLEED_RESISTANCE,
         attack_cooldown=config.DEFAULT_ATTACK_COOLDOWN,
         kill_count=0,
+        attack_range=0,
         *args,
         **kwargs,
     ):
@@ -490,6 +491,7 @@ class CombatantSprite(LivingSprite):
 
         self.attack_cooldown = attack_cooldown
         self.kill_count = kill_count
+        self.attack_range = attack_range
 
         self.draw_mult = 0
         self.attack_cooldown_timer = 0.0
