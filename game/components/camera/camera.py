@@ -55,7 +55,7 @@ class CameraAwareLayeredUpdates(pygame.sprite.LayeredUpdates):
                 min(0, self.cam.y),
             )
 
-    def draw(self, surface):
+    def draw(self, surface, *args, **kwargs):
         spritedict = self.spritedict
         dirty = self.lostsprites
         self.lostsprites = []

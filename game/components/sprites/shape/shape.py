@@ -32,7 +32,7 @@ class Shape(Sprite):
         kwargs["name"] = kwargs.get("name", "shape")
         super().__init__(*args, **kwargs)
 
-    def draw(self):
+    def draw(self, *args, **kwargs):
         super().draw()
         self.image.fill((0, 0, 0, 0))
 
@@ -81,7 +81,7 @@ class Polygon(Shape):
 
         return vertices
 
-    def draw(self):
+    def draw(self, *args, **kwargs):
         super().draw()
         pygame.draw.polygon(
             self.image, self.border_color, self.vertices, self.border_width
@@ -151,7 +151,7 @@ class Crosshair(Shape):
             **kwargs,
         )
 
-    def draw(self):
+    def draw(self, *args, **kwargs):
         self.image.fill((0, 0, 0, 0))
         inner_width = 6
         self.image.fill(

@@ -220,7 +220,7 @@ class TargetedTextBox(TextBox):
 
         d = (d0 + d1) / 2 + self.offset
 
-        m = math.tan(self.angle % 360)
+        m = math.tan(self.angle % 360.0)
 
         self.rect.center = (x0, y0 + h0 / 2 + self.offset + h1 / 2)
 
