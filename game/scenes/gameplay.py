@@ -561,9 +561,18 @@ class GameplayScene(Scene):
 
         self.player = self.spawn_animated_sprite(player_data, False, True)
 
+        _name = "weapon_green_magic_staff"
+        weapon = MagicStaff(
+            name=_name,
+            image=self.asset_cache[(config.SPRITESHEETS["0x72d2"]["filepath"], _name)],
+            offset=(self.player.image.get_size()[0] + 10, 0),
+        )
+        self.player.equip_weapon(weapon)
         self.player_sprites.add(
             self.player,
             self.player.debug_textbox,  # , health_bar, mana_bar, stamina_bar
+            self.player.outline,
+            self.player.weapon,
         )
 
         if self.all_sprites:
