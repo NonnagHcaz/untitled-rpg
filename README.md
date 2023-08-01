@@ -5,7 +5,7 @@ This is my labor of love project to learn game development with Python and to ma
 
 Don't expect much.
 
-[Version 0.0.3 Nightly build 1](https://github.com/NonnagHcaz/untitled-rpg/releases) out now!
+[Version 0.0.4 "Better" Combat](https://github.com/NonnagHcaz/untitled-rpg/releases) out now!
 
 Setup
 -----
