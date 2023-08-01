@@ -223,6 +223,41 @@ class Sprite(pygame.sprite.Sprite):
         return all(self.check_collisions(others))
 
 
+class TargetedSprite(Sprite):
+    def __init__(self, target, follow_target=True, *groups, **kwargs):
+        self.target = target
+        self.follow_target = follow_target
+        kwargs["image"] = kwargs.get(
+            "image", pygame.Surface(self.target.image.get_size(), pygame.SRCALPHA)
+        )
+        kwargs["name"] = kwargs.get(
+            "name",
+            f"{str(getattr(self.target, 'name', target.__class__))}_{self.__class__}",
+        )
+        super().__init__(*groups, **kwargs)
+
+    def update(self, *args, **kwargs):
+        if self.follow_target:
+            self.rect.topleft = self.target.rect.topleft
+        self.draw()
+
+
+class Outline(TargetedSprite):
+    def __init__(self, border_width=2, border_color=(0, 0, 0), *groups, **kwargs):
+        super().__init__(*groups, **kwargs)
+        self.border_width = border_width
+        self.border_color = border_color
+
+    def draw(self, *args, **kwargs):
+        outline = [
+            (x + self.target.pos[0], y + self.target.pos[1])
+            for x, y in self.target.mask.outline()
+        ]
+        pygame.draw.lines(
+            self.image, self.border_color, True, outline, self.border_width
+        )
+
+
 class MergedSprite(Sprite):
     def __init__(self, sprites=[], *groups, **kwargs):
         super().__init__(*groups, **kwargs)
