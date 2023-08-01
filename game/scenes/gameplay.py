@@ -22,7 +22,7 @@ from game.components.sprites.entities.enemies.enemy import Enemy
 from game.components.sprites.entities.player import Player
 
 from game.components.sprites.shape.shape import Hitbox
-from game.components.sprites.sprite import Sprite
+from game.components.sprites.sprite import Outline, Sprite
 from game.components.sprites.status_bar.status_bar import TargetedStatusBar
 
 
@@ -60,6 +60,7 @@ class GameplayScene(Scene):
         self.player = None
         self.enemies = None
         self.hitboxes = None
+        self.outlines = None
         self.projectiles = None
         self.walls = None
         self.floors = None
@@ -96,6 +97,7 @@ class GameplayScene(Scene):
         self.player_sprites = pygame.sprite.Group()
         self.projectiles.add(self.player_projectiles, self.enemy_projectiles)
         self.hitboxes = pygame.sprite.Group()
+        self.outlines = pygame.sprite.Group()
         self.status_bars = pygame.sprite.Group()
         self.debug_textboxes = pygame.sprite.Group()
 
@@ -265,6 +267,13 @@ class GameplayScene(Scene):
             text={"func": sprite.get_data_pretty, "args": [self.cam]},
             max_width=sprite.rect.width * 2,
             size=12,
+        )
+
+    def get_sprite_outline(self, sprite):
+        return Outline(
+            target=sprite,
+            border_color=config.HEALTH_RED,
+            border_width=2,
         )
 
     def spawn_random_enemy(self):
@@ -486,6 +495,7 @@ class GameplayScene(Scene):
         sprite_data,
         has_health_bar=True,
         has_debug_textbox=True,
+        has_outline=True,
     ):
         name = sprite_data["name"]
         idle_frames = [
@@ -528,6 +538,11 @@ class GameplayScene(Scene):
             debug_textbox = self.get_sprite_debug_textbox(sprite)
             sprite.debug_textbox = debug_textbox
             self.debug_textboxes.add(debug_textbox)
+
+        if has_outline:
+            outline = self.get_sprite_outline(sprite)
+            sprite.outline = outline
+            self.outlines.add(outline)
 
         return sprite
 
