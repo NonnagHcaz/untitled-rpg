@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class Weapon(Sprite):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, offset=(10, 0), *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.offset = offset
 
     def use(self):
         pass
