@@ -1,5 +1,7 @@
 import logging
 
+import pygame
+
 from game.components.sprites.entities.entity import Entity
 
 logger = logging.getLogger(__name__)
@@ -39,6 +41,15 @@ class Player(Entity):
         self.weapon = weapon
         self.armor = armor
         self.inventory = inventory or Inventory()
+
+    def equip_weapon(self, weapon):
+        if self.weapon:
+            self.drop(self.weapon)
+        self.weapon = weapon
+
+    def drop_weapon(self):
+        # TODO: Drop weapon on the ground?
+        self.weapon = None
 
     def interact(self, other):
         pass
@@ -84,3 +95,17 @@ class Player(Entity):
             regen_mana=regen_mana,
             regen_stamina=regen_stamina,
         )
+        if self.weapon:
+            self.update_weapon_position()
+
+    def update_weapon_position(self):
+        weapon_offset = pygame.Vector2(self.weapon.offset)
+
+        if self.direction == self.Direction.EAST:
+            self.weapon.rect.midright = (
+                pygame.Vector2(self.rect.midleft) + weapon_offset
+            )
+        else:
+            self.weapon.rect.midleft = (
+                pygame.Vector2(self.rect.midright) - weapon_offset
+            )
