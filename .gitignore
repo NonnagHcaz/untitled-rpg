@@ -155,3 +155,4 @@ cython_debug/
 game/components/console/example.py
 data/conf/
 data/
+assets/
