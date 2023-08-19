@@ -16,25 +16,25 @@ from pygame.locals import (
     K_PAGEDOWN,
 )
 
-from game.components.camera.camera import Camera, CameraAwareLayeredUpdates
-from game.components.sprites.cursor.cursor import Cursor
-from game.components.sprites.entities.enemies.enemy import Enemy
-from game.components.sprites.entities.player import Player
+from game.camera.camera import Camera, CameraAwareLayeredUpdates
+from game.sprites.cursor.cursor import Cursor
+from game.sprites.entities.enemies.enemy import Enemy
+from game.sprites.entities.player import Player
 
-from game.components.sprites.shape.shape import Hitbox
-from game.components.sprites.sprite import Outline, Sprite
-from game.components.sprites.status_bar.status_bar import TargetedStatusBar
+from game.sprites.shape.shape import Hitbox
+from game.sprites.sprite import Outline, Sprite
+from game.sprites.status_bar.status_bar import TargetedStatusBar
 
 
 import logging
-from game.components.sprites.text.textbox import TargetedTextBox
-from game.components.sprites.ui.status_bar import (
+from game.sprites.text.textbox import TargetedTextBox
+from game.sprites.ui.status_bar import (
     UIExperienceBar,
     UIHealthBar,
     UIManaBar,
     UIStaminaBar,
 )
-from game.components.sprites.weapons.weapon import MagicOrb, MagicStaff
+from game.sprites.weapons.weapon import MagicOrb, MagicStaff
 from game.level import Dungeon
 
 from game.scenes.scene import Scene

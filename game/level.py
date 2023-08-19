@@ -3,11 +3,11 @@ import os
 import random
 import pygame
 from game import config
-from game.components.sprites.entities.enemies.enemy import Enemy
-from game.components.sprites.entities.entity import Entity
-from game.components.sprites.entities.player import Player
-from game.components.sprites.sprite import MovableSprite, Sprite, MergedSprite
-from game.components.sprites.weapons.weapon import (
+from game.sprites.entities.enemies.enemy import Enemy
+from game.sprites.entities.entity import Entity
+from game.sprites.entities.player import Player
+from game.sprites.sprite import MovableSprite, Sprite, MergedSprite
+from game.sprites.weapons.weapon import (
     Arrow,
     MagicOrb,
     Projectile,

@@ -2,7 +2,7 @@
 
 import pygame
 
-from game.components.camera.camera import CameraAwareLayeredUpdates
+from game.camera.camera import CameraAwareLayeredUpdates
 
 
 class Scene(object):

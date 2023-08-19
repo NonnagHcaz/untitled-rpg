@@ -1,7 +1,7 @@
 import pygame
 import math
 
-from game.components.sprites.sprite import Sprite
+from game.sprites.sprite import Sprite
 
 
 class Shape(Sprite):

@@ -1,7 +1,7 @@
 import pygame
 from game import config
 
-from game.components.sprites.shape.shape import Shape
+from game.sprites.shape.shape import Shape
 
 
 class StatusBar(Shape):

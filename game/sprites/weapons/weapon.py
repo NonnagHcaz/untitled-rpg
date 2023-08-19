@@ -4,7 +4,7 @@ import pygame
 
 import logging
 
-from game.components.sprites.sprite import CombatantSprite, MovableSprite, Sprite
+from game.sprites.sprite import CombatantSprite, MovableSprite, Sprite
 
 logger = logging.getLogger(__name__)
 

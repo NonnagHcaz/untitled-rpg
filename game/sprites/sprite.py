@@ -291,10 +291,25 @@ class MergedSprite(Sprite):
 
 
 class AnimatedSprite(Sprite):
-    def __init__(self, idle_frames=[], walk_frames=[], black_frames=4, *args, **kwargs):
+    def __init__(
+        self,
+        idle_frames=[],
+        walk_frames=[],
+        swim_frames=[],
+        roll_frames=[],
+        death_frames=[],
+        attack_frames=[],
+        black_frames=4,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.idle_frames = idle_frames
         self.walk_frames = walk_frames
+        self.swim_frames = swim_frames
+        self.roll_frames = roll_frames
+        self.death_frames = death_frames
+        self.attack_frames = attack_frames
         self.idle_masks = [pygame.mask.from_surface(x) for x in self.idle_frames]
         self.walk_masks = [pygame.mask.from_surface(x) for x in self.walk_frames]
         self.black_frames = black_frames

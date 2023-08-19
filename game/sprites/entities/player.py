@@ -2,7 +2,7 @@ import logging
 
 import pygame
 
-from game.components.sprites.entities.entity import Entity
+from game.sprites.entities.entity import Entity
 
 logger = logging.getLogger(__name__)
 

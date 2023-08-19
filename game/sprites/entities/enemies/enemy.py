@@ -1,7 +1,7 @@
 import random
 import pygame
 
-from game.components.sprites.entities.entity import Entity
+from game.sprites.entities.entity import Entity
 
 
 class Enemy(Entity):

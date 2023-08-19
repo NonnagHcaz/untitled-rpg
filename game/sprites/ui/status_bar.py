@@ -1,6 +1,6 @@
 import pygame
 
-from game.components.sprites.status_bar.status_bar import (
+from game.sprites.status_bar.status_bar import (
     ExperienceBar,
     HealthBar,
     StaminaBar,

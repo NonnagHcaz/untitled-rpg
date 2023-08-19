@@ -1,6 +1,6 @@
 import pygame
 
-from game.components.sprites.sprite import Sprite
+from game.sprites.sprite import Sprite
 
 
 class Cursor(Sprite):
